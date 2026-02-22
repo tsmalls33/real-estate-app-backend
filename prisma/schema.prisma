@@ -127,7 +127,7 @@ model PropertyStats {
 
 model Reservation {
   id_reservation String            @id @default(uuid())
-  clientName     String
+  guestName      String
   numberOfGuests Int
   startDate      DateTime
   endDate        DateTime
