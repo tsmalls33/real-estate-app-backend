@@ -9,7 +9,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SignInDto, SignInResponseDto } from './dto/signin.dto';
 import { SignUpDto } from './dto/signup.dto';
 import { JwtService } from '@nestjs/jwt';
-import { UserResponseDto } from 'packages/types/dist';
+import { UserResponseDto } from '@RealEstate/types';
 
 @Injectable()
 export class AuthService {
@@ -22,18 +22,16 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
-  // Type this return
   async signIn(input: SignInDto): Promise<SignInResponseDto> {
-    // Deconstruct the DTO
     const { email, password } = input;
 
     const user = await this.userService.findByEmail(email, true);
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    if (!user.passwordHash) throw new BadRequestException('User has no saved password')
+    if (!user.passwordHash) throw new BadRequestException('User has no saved password');
 
     const isPasswordValid = await this.userService.verifyPassword(
       password,
@@ -43,7 +41,6 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Generate JWT token
     if (
       !this.jwtSecret ||
       !this.jwtRefreshSecret ||
@@ -77,26 +74,22 @@ export class AuthService {
       },
       accessToken,
       refreshToken,
-    }
+    };
   }
 
-  // Type this return
   async signUp(input: SignUpDto): Promise<UserResponseDto> {
-    const { email, password, fullName, role, id_tenant } = input;
+    const { email, password, firstName, lastName, role, id_tenant } = input;
 
-    // Check if the user already exists --> This is handled by the UserService.create
-    // Hash the password --> This is handled by the UserService.create
-    // Create a new user --> This is handled by the UserService.create
     const newUser = await this.userService.createUser({
       email,
       password,
-      fullName,
+      firstName,
+      lastName,
       role,
       id_tenant,
     });
 
-    return newUser
-
+    return newUser;
   }
 
   async refreshToken(refreshToken: string) {
@@ -118,11 +111,9 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    // Ensure we include the latest user role in the token payload
     const currentUser = await this.userService.findOne(verifiedToken.sub);
     const payload = { sub: currentUser.id_user, email: currentUser.email, role: currentUser.role };
 
-    // Generate both new access token and new refresh token (token rotation)
     const newAccessToken = await this.generateToken(
       this.jwtSecret,
       payload,
