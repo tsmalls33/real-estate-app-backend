@@ -59,7 +59,6 @@ model Theme {
 
   tenants Tenant[]
 
-  @@map("themes")
   @@index([isDeleted])
 }
 
