@@ -65,8 +65,8 @@ export class PropertyRepository {
   }
 
   async existsById(id_property: string): Promise<boolean> {
-    const property = await this.prisma.property.findUnique({
-      where: { id_property },
+    const property = await this.prisma.property.findFirst({
+      where: { id_property, isDeleted: false },
       select: { id_property: true },
     });
     return property !== null;

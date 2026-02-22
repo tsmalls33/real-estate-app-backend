@@ -116,7 +116,7 @@ export class UserService {
     if (!userExists) {
       throw new NotFoundException('User not found');
     }
-    return await this.userRepository.delete(id_user);
+    return await this.userRepository.softDelete(id_user);
   }
 
   async findAgentPayments(id_user: string) {

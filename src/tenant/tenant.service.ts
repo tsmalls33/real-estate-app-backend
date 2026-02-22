@@ -79,7 +79,7 @@ export class TenantService {
     if (!tenantExists)
       throw new NotFoundException(`Tenant with '${id_tenant}' not found`); // returns 404 Not Found
 
-    return this.tenantRepository.delete(id_tenant) as Promise<TenantResponseDto>;
+    return this.tenantRepository.softDelete(id_tenant) as Promise<TenantResponseDto>;
   }
 
   async updateTheme(id_tenant: string, id_theme: string): Promise<TenantResponseDto> {

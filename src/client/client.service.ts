@@ -15,7 +15,6 @@ export class ClientService {
 
   async findAll(query: GetClientsQueryParams) {
     return this.clientRepository.findAll({
-      isActive: query.isActive,
       search: query.search,
       page: query.page ?? 1,
       limit: query.limit ?? 20,

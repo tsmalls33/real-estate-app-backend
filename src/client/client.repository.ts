@@ -12,15 +12,14 @@ export class ClientRepository {
   }
 
   async findAll(params: {
-    isActive?: boolean;
     search?: string;
     page: number;
     limit: number;
   }) {
-    const { isActive, search, page, limit } = params;
+    const { search, page, limit } = params;
 
     const where: Prisma.ClientWhereInput = {
-      ...(isActive !== undefined && { isActive }),
+      isDeleted: false,
       ...(search && {
         OR: [
           { firstName: { contains: search, mode: 'insensitive' } },
@@ -45,17 +44,18 @@ export class ClientRepository {
   }
 
   async findById(id_client: string) {
-    return this.prisma.client.findUnique({
-      where: { id_client },
+    return this.prisma.client.findFirst({
+      where: { id_client, isDeleted: false },
       select: CLIENT_SELECT,
     });
   }
 
-  async existsById(id_client: string) {
-    return this.prisma.client.findUnique({
-      where: { id_client },
+  async existsById(id_client: string): Promise<boolean> {
+    const client = await this.prisma.client.findFirst({
+      where: { id_client, isDeleted: false },
       select: { id_client: true },
     });
+    return client !== null;
   }
 
   async update(id_client: string, data: Prisma.ClientUncheckedUpdateInput) {
@@ -69,7 +69,7 @@ export class ClientRepository {
   async softDelete(id_client: string) {
     return this.prisma.client.update({
       where: { id_client },
-      data: { isActive: false },
+      data: { isDeleted: true },
       select: CLIENT_SELECT,
     });
   }

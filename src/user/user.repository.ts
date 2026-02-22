@@ -26,6 +26,7 @@ export class UserRepository {
 
   async findAll(): Promise<User[]> {
     return await this.prisma.user.findMany({
+      where: { isDeleted: false },
       select: USER_PUBLIC_SELECT,
     }) as User[]
   }
@@ -37,8 +38,8 @@ export class UserRepository {
   }
 
   async findById(id_user: string): Promise<User | null> {
-    return await this.prisma.user.findUnique({
-      where: { id_user },
+    return await this.prisma.user.findFirst({
+      where: { id_user, isDeleted: false },
       select: USER_PUBLIC_SELECT,
     }) as User | null
   }
@@ -66,8 +67,8 @@ export class UserRepository {
   }
 
   async existsById(id_user: string): Promise<boolean> {
-    const user = await this.prisma.user.findUnique({
-      where: { id_user },
+    const user = await this.prisma.user.findFirst({
+      where: { id_user, isDeleted: false },
       select: { id_user: true },
     });
     return user !== null;
