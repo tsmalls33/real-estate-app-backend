@@ -21,6 +21,8 @@ export class PlanService {
 
     return this.planRepository.create({
       name: createPlanDto.name,
+      price: createPlanDto.price,
+      pricePeriod: createPlanDto.pricePeriod,
       isActive: createPlanDto.isActive ?? true,
     }) as Promise<PlanResponseDto>;
   }
@@ -40,7 +42,12 @@ export class PlanService {
     id_plan: string,
     updatePlanDto: UpdatePlanDto,
   ): Promise<PlanResponseDto> {
-    if (!updatePlanDto.name && updatePlanDto.isActive === undefined)
+    if (
+      !updatePlanDto.name &&
+      updatePlanDto.isActive === undefined &&
+      updatePlanDto.price === undefined &&
+      !updatePlanDto.pricePeriod
+    )
       throw new ConflictException('No fields to update');
 
     if (updatePlanDto.name) {
