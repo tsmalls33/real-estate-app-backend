@@ -24,18 +24,18 @@ export class PlanService {
       price: createPlanDto.price,
       pricePeriod: createPlanDto.pricePeriod,
       isActive: createPlanDto.isActive ?? true,
-    }) as Promise<PlanResponseDto>;
+    }) as unknown as Promise<PlanResponseDto>;
   }
 
   async findAll(isActive?: boolean): Promise<PlanResponseDto[]> {
-    return this.planRepository.findAll(isActive) as Promise<PlanResponseDto[]>;
+    return this.planRepository.findAll(isActive) as unknown as Promise<PlanResponseDto[]>;
   }
 
   async findOne(id_plan: string): Promise<PlanResponseDto> {
     const plan = await this.planRepository.findById(id_plan);
     if (!plan)
       throw new NotFoundException(`Plan with id '${id_plan}' not found`);
-    return plan as PlanResponseDto;
+    return plan as unknown as PlanResponseDto;
   }
 
   async update(
@@ -67,7 +67,7 @@ export class PlanService {
     return this.planRepository.update(
       id_plan,
       updatePlanDto,
-    ) as Promise<PlanResponseDto>;
+    ) as unknown as Promise<PlanResponseDto>;
   }
 
   async remove(id_plan: string): Promise<PlanResponseDto> {
@@ -81,6 +81,6 @@ export class PlanService {
         `Cannot delete plan: ${tenantCount} tenant(s) are currently using it`,
       );
 
-    return this.planRepository.softDelete(id_plan) as Promise<PlanResponseDto>;
+    return this.planRepository.softDelete(id_plan) as unknown as Promise<PlanResponseDto>;
   }
 }
