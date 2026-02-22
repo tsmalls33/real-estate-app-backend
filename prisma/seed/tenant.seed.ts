@@ -1,29 +1,30 @@
-import type { PrismaClient, Tenant } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { SeedTenantsResult } from './seed-types';
 
+const DEFAULT_TENANTS = [
+  { name: 'Default Tenant', customDomain: null as string | null },
+  { name: 'Devomart', customDomain: 'www.devomart.es' },
+];
+
 export async function seedTenants(prisma: PrismaClient): Promise<SeedTenantsResult> {
-  // Use upsert because Tenant.name is unique
+  console.log('Seeding tenants...');
+
   const defaultTenant = await prisma.tenant.upsert({
-    where: { name: 'Default Tenant' },
-    update: { customDomain: null },
-    create: {
-      name: 'Default Tenant',
-      customDomain: null,
-    },
+    where: { name: DEFAULT_TENANTS[0].name },
+    update: { customDomain: DEFAULT_TENANTS[0].customDomain },
+    create: DEFAULT_TENANTS[0],
   });
 
   const devomartTenant = await prisma.tenant.upsert({
-    where: { name: 'Devomart' },
-    update: { customDomain: 'www.devomart.es' },
-    create: {
-      name: 'Devomart',
-      customDomain: 'www.devomart.es',
-    },
+    where: { name: DEFAULT_TENANTS[1].name },
+    update: { customDomain: DEFAULT_TENANTS[1].customDomain },
+    create: DEFAULT_TENANTS[1],
   });
+
+  console.log('Tenants seeded successfully');
 
   return {
     default: defaultTenant,
     devomart: devomartTenant,
   };
 }
-

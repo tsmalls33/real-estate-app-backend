@@ -1,5 +1,4 @@
-import type { PrismaClient } from '@prisma/client';
-import { UserRoles } from '@prisma/client';
+import { PrismaClient, UserRoles } from '@prisma/client';
 import { seedPasswordHash } from './_password';
 import { SeedTenantsResult, SeeUsersResult } from './seed-types';
 
@@ -7,7 +6,9 @@ export async function seedUsers(
   prisma: PrismaClient,
   tenants: SeedTenantsResult,
 ): Promise<SeeUsersResult> {
-  const passwordHash = await seedPasswordHash('Password123!'); // hash once, reuse [web:147]
+  console.log('Seeding users...');
+
+  const passwordHash = await seedPasswordHash('Password123!');
 
   const superadmin = await prisma.user.upsert({
     where: { email: 'superadmin@gmail.com' },
@@ -69,8 +70,7 @@ export async function seedUsers(
     },
   });
 
+  console.log('Users seeded successfully');
+
   return { superadmin, defaultAdmin, devomartAdmin, devomartEmployee };
 }
-
-
-
