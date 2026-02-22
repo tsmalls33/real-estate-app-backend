@@ -11,19 +11,13 @@ export async function seedTenants(prisma: PrismaClient): Promise<SeedTenantsResu
 
   const result: Record<string, Tenant> = {};
 
-  await prisma.$transaction(
-    DEFAULT_TENANTS.map(({ key, ...data }) =>
-      prisma.tenant
-        .upsert({
-          where: { name: data.name },
-          update: { customDomain: data.customDomain },
-          create: data,
-        })
-        .then((tenant) => {
-          result[key] = tenant;
-        }),
-    ),
-  );
+  for (const { key, ...data } of DEFAULT_TENANTS) {
+    result[key] = await prisma.tenant.upsert({
+      where: { name: data.name },
+      update: { customDomain: data.customDomain },
+      create: data,
+    });
+  }
 
   console.log('Tenants seeded successfully');
 
