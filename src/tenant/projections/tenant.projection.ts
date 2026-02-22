@@ -4,6 +4,7 @@ export const TENANT_PUBLIC_SELECT = {
   id_tenant: true,
   name: true,
   customDomain: true,
+  id_theme: true,
 } as const;
 
 export const TENANT_WITH_USERS_SELECT = {
@@ -12,4 +13,3 @@ export const TENANT_WITH_USERS_SELECT = {
     select: USER_PUBLIC_SELECT,
   },
 } as const;
-

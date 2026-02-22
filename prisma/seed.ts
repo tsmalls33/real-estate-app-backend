@@ -1,7 +1,7 @@
-
 import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 
+import { seedThemes } from './seed/theme.seed';
 import { seedTenants } from './seed/tenant.seed';
 import { seedUsers } from './seed/user.seed';
 
@@ -9,6 +9,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('Running seeds......')
+  await seedThemes(prisma);
   const tenants = await seedTenants(prisma);
   await seedUsers(prisma, tenants);
 }
@@ -21,5 +22,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-
-

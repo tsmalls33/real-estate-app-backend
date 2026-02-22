@@ -7,11 +7,15 @@ import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
 import { TenantResponseDto } from './dto/tenant-response.dto';
 import { TenantRepository } from './tenant.repository';
+import { ThemeService } from '../theme/theme.service';
 
 
 @Injectable()
 export class TenantService {
-  constructor(private readonly tenantRepository: TenantRepository) { }
+  constructor(
+    private readonly tenantRepository: TenantRepository,
+    private readonly themeService: ThemeService,
+  ) { }
 
   async createTenant(createTenantDto: CreateTenantDto): Promise<TenantResponseDto> {
     const isTenantExists = await this.tenantRepository.existsByName(createTenantDto.name);
@@ -76,5 +80,17 @@ export class TenantService {
       throw new NotFoundException(`Tenant with '${id_tenant}' not found`); // returns 404 Not Found
 
     return this.tenantRepository.delete(id_tenant) as Promise<TenantResponseDto>;
+  }
+
+  async updateTheme(id_tenant: string, id_theme: string): Promise<TenantResponseDto> {
+    // validate theme exists before assigning
+    await this.themeService.findOne(id_theme);
+
+    // check if tenant exists
+    const tenantExists = await this.tenantRepository.existsById(id_tenant);
+    if (!tenantExists)
+      throw new NotFoundException(`Tenant with id '${id_tenant}' not found`); // returns 404 Not Found
+
+    return this.tenantRepository.assignTheme(id_tenant, id_theme) as Promise<TenantResponseDto>;
   }
 }

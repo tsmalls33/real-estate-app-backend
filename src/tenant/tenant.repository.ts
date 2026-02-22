@@ -57,4 +57,12 @@ export class TenantRepository {
       select: TENANT_PUBLIC_SELECT,
     }) as Tenant;
   }
+
+  async assignTheme(id_tenant: string, id_theme: string): Promise<Tenant> {
+    return await this.prisma.tenant.update({
+      where: { id_tenant },
+      data: { id_theme },
+      select: TENANT_PUBLIC_SELECT,
+    }) as Tenant;
+  }
 }

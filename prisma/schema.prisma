@@ -34,13 +34,33 @@ model Tenant {
   name         String   @unique
   customDomain String?  @unique @db.VarChar(255)
   id_plan      String?
+  id_theme     String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now()) @updatedAt
   isDeleted    Boolean  @default(false)
 
   users      User[]     @relation("TenantUsers")
   plan       Plan?      @relation(fields: [id_plan], references: [id_plan])
+  theme      Theme?     @relation(fields: [id_theme], references: [id_theme])
   properties Property[] @relation("TenantProperties")
+}
+
+model Theme {
+  id_theme   String   @id @default(uuid())
+  name       String
+  primary    String
+  secondary  String
+  accent     String
+  logoIcon   String?
+  logoBanner String?
+  isDeleted  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  tenants Tenant[]
+
+  @@map("themes")
+  @@index([isDeleted])
 }
 
 model Plan {
