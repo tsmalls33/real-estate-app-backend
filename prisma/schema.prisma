@@ -23,7 +23,6 @@ model User {
   userProperties  Property[] @relation("UserProperties")
   agentProperties Property[] @relation("AgentProperties")
 
-  // Relations
   agentPayments AgentPayment[]
   clients       Client[]
 
@@ -64,10 +63,12 @@ model Theme {
 }
 
 model Plan {
-  id_plan  String   @id @default(uuid())
-  name     String   @unique
-  tenants  Tenant[]
-  isActive Boolean  @default(true)
+  id_plan     String     @id @default(uuid())
+  name        String     @unique
+  price       Decimal    @db.Decimal(10, 2)
+  pricePeriod PlanPeriod
+  tenants     Tenant[]
+  isActive    Boolean    @default(true)
 }
 
 model Property {
@@ -265,4 +266,9 @@ enum PropertyStatus {
   INACTIVE
   SOLD
   UNDER_RENTAL
+}
+
+enum PlanPeriod {
+  MONTHLY
+  YEARLY
 }
