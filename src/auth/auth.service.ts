@@ -1,8 +1,6 @@
 import {
   Injectable,
   UnauthorizedException,
-  NotFoundException,
-  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -27,15 +25,20 @@ export class AuthService {
   async signIn(input: SignInDto): Promise<SignInResponseDto> {
     const { email, password } = input;
 
-    const user = await this.userService.findByEmail(email, true);
-    if (!user) {
-      throw new NotFoundException('User not found');
+    let user: Awaited<ReturnType<typeof this.userService.findByEmail>> | null;
+    try {
+      user = await this.userService.findByEmail(email, true);
+    } catch {
+      throw new UnauthorizedException('Invalid credentials');
     }
-    if (!user.passwordHash) throw new BadRequestException('User has no saved password');
+
+    if (!user?.passwordHash) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
     const isPasswordValid = await this.userService.verifyPassword(
       password,
-      user.passwordHash!,
+      user.passwordHash,
     );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');

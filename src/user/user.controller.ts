@@ -41,6 +41,8 @@ export class UserController {
 
   @Get(':id_user')
   @ResponseMessage('User fetched successfully')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRoles.ADMIN, UserRoles.SUPERADMIN)
   findOne(@Param('id_user') id_user: string) {
     return this.userService.findOne(id_user);
   }
@@ -55,6 +57,8 @@ export class UserController {
 
   @Put(':id_user')
   @ResponseMessage('User updated successfully')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRoles.ADMIN, UserRoles.SUPERADMIN)
   update(@Param('id_user') id_user: string, @Body() input: UpdateUserDto) {
     return this.userService.update(id_user, input);
   }
