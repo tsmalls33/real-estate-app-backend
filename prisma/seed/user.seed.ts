@@ -43,19 +43,13 @@ export async function seedUsers(
   const passwordHash = await seedPasswordHash('Password123!');
   const result: Record<string, User> = {};
 
-  await prisma.$transaction(
-    DEFAULT_USERS(tenants).map(({ key, ...data }) =>
-      prisma.user
-        .upsert({
-          where: { email: data.email },
-          update: { fullName: data.fullName, role: data.role, id_tenant: data.id_tenant },
-          create: { ...data, passwordHash },
-        })
-        .then((user) => {
-          result[key] = user;
-        }),
-    ),
-  );
+  for (const { key, ...data } of DEFAULT_USERS(tenants)) {
+    result[key] = await prisma.user.upsert({
+      where: { email: data.email },
+      update: { fullName: data.fullName, role: data.role, id_tenant: data.id_tenant },
+      create: { ...data, passwordHash },
+    });
+  }
 
   console.log('Users seeded successfully');
 
