@@ -23,12 +23,12 @@ export class UpdateThemeDto implements SharedUpdateThemeDto {
   @IsString()
   accent?: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false, example: 'logoicon.com' })
   @IsOptional()
   @IsString()
   logoIcon?: string | null;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false, example: 'logobanner.com' })
   @IsOptional()
   @IsString()
   logoBanner?: string | null;
