@@ -81,7 +81,7 @@
 | Field | Type | Description |
 | - | - | - |
 | id_reservation | UUID PK | Reservation id |
-| clientName | string | Name of the client |
+| guestName | string | Name of the guest |
 | startDate | date | Start date of reservation |
 | endDate | date | End date of reservation |
 | totalPrice | number | Total price of the reservation |
