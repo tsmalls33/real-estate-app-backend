@@ -4,7 +4,7 @@ import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { GetPropertiesQueryParams } from './dto/get-properties-query-params';
 import { GetReservationsQueryParams } from './dto/get-reservations-query-params';
-import { GetCostsQueryParams } from './dto/get-costs-query-params';
+
 import { PropertyRepository } from './property.repository';
 
 @Injectable()
@@ -66,15 +66,4 @@ export class PropertyService {
     });
   }
 
-  async findCosts(id_property: string, query: GetCostsQueryParams) {
-    const exists = await this.propertyRepository.existsById(id_property);
-    if (!exists)
-      throw new NotFoundException(`Property with id '${id_property}' not found`);
-    return this.propertyRepository.findCosts(id_property, {
-      startDate: query.startDate,
-      endDate: query.endDate,
-      costType: query.costType,
-      id_reservation: query.id_reservation,
-    });
-  }
 }

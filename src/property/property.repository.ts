@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import {
-  CostType,
   Platform,
   Prisma,
   Property,
@@ -117,30 +116,4 @@ export class PropertyRepository {
     });
   }
 
-  async findCosts(
-    id_property: string,
-    filters: {
-      startDate?: string;
-      endDate?: string;
-      costType?: CostType;
-      id_reservation?: string;
-    },
-  ) {
-    return this.prisma.cost.findMany({
-      where: {
-        id_property,
-        ...(filters.costType && { costType: filters.costType }),
-        ...(filters.id_reservation && {
-          id_reservation: filters.id_reservation,
-        }),
-        ...((filters.startDate || filters.endDate) && {
-          date: {
-            ...(filters.startDate && { gte: new Date(filters.startDate) }),
-            ...(filters.endDate && { lte: new Date(filters.endDate) }),
-          },
-        }),
-      },
-      orderBy: { date: 'desc' },
-    });
-  }
 }
