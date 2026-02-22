@@ -1,0 +1,1 @@
+{"version":3,"file":"user.projection.js","sourceRoot":"","sources":["../../../../src/user/projections/user.projection.ts"],"names":[],"mappings":";;;AAAa,QAAA,kBAAkB,GAAG;IAChC,OAAO,EAAE,IAAI;IACb,KAAK,EAAE,IAAI;IACX,QAAQ,EAAE,IAAI;IACd,IAAI,EAAE,IAAI;IACV,SAAS,EAAE,IAAI;CACP,CAAC;AAEE,QAAA,gBAAgB,GAAG;IAC9B,GAAG,0BAAkB;IACrB,YAAY,EAAE,IAAI;CACV,CAAC"}

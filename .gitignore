@@ -1,6 +1,7 @@
 # compiled output
 /dist
-/packages/types/dist
+*/dist
+*/*/dist
 /node_modules
 /build
 

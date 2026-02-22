@@ -1,0 +1,1 @@
+{"version":3,"file":"tenant.projection.js","sourceRoot":"","sources":["../../../../src/tenant/projections/tenant.projection.ts"],"names":[],"mappings":";;;AAAA,4EAA4E;AAE/D,QAAA,oBAAoB,GAAG;IAClC,SAAS,EAAE,IAAI;IACf,IAAI,EAAE,IAAI;IACV,YAAY,EAAE,IAAI;IAClB,QAAQ,EAAE,IAAI;CACN,CAAC;AAEE,QAAA,wBAAwB,GAAG;IACtC,GAAG,4BAAoB;IACvB,KAAK,EAAE;QACL,MAAM,EAAE,oCAAkB;KAC3B;CACO,CAAC"}
