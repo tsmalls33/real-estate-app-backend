@@ -1,15 +1,14 @@
-import { UserResponseDto as SharedUserResponseDto } from "@RealEstate/types";
+import { UserRoles } from '@RealEstate/types';
 
-export class UserResponseDto implements SharedUserResponseDto {
-  id_user: string;
-  email: string;
-  fullName?: string | null;
-  role: SharedUserResponseDto["role"];
+export class UserResponseDto {
+  id_user!: string;
+  email!: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  role!: UserRoles;
   id_tenant?: string | null;
 }
 
 export class PrivateUserResponseDto extends UserResponseDto {
-  passwordHash?: string
+  passwordHash?: string;
 }
-
-

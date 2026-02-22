@@ -11,7 +11,8 @@ model User {
   id_user      String    @id @default(uuid())
   email        String    @unique @db.VarChar(255)
   passwordHash String
-  fullName     String?   @db.VarChar(100)
+  firstName    String?   @db.VarChar(40)
+  lastName     String?   @db.VarChar(40)
   role         UserRoles @default(CLIENT)
   id_tenant    String?
   createdAt    DateTime  @default(now())
@@ -63,12 +64,10 @@ model Theme {
 }
 
 model Plan {
-  id_plan     String     @id @default(uuid())
-  name        String     @unique
-  price       Decimal    @db.Decimal(10, 2)
-  pricePeriod PlanPeriod
-  tenants     Tenant[]
-  isActive    Boolean    @default(true)
+  id_plan  String   @id @default(uuid())
+  name     String   @unique
+  tenants  Tenant[]
+  isActive Boolean  @default(true)
 }
 
 model Property {
@@ -202,10 +201,10 @@ model Client {
   email       String? @unique @db.VarChar(255)
   phoneNumber String? @db.VarChar(30)
   notes       String? @db.Text
-  id_user     String
+  id_user     String?
   isActive    Boolean @default(true)
 
-  user User @relation(fields: [id_user], references: [id_user])
+  user User? @relation(fields: [id_user], references: [id_user])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -227,11 +226,6 @@ enum UserRoles {
   SUPERADMIN
   CLIENT
   EMPLOYEE
-}
-
-enum PlanPeriod {
-  MONTHLY
-  YEARLY
 }
 
 enum SaleType {

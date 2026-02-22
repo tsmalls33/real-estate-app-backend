@@ -1,4 +1,3 @@
-
 import {
   Injectable,
   ConflictException,
@@ -32,20 +31,18 @@ export class UserService {
   }
 
   async createUser(input: CreateUserDto): Promise<UserResponseDto> {
-    // Check if user already exists
     const isUserExists = await this.userRepository.existsByEmail(input.email);
     if (isUserExists) {
       throw new ConflictException('User already exists');
     }
 
-    // Hash password
     const hashedPassword = await this.hashPassword(input.password);
-
-    const { email, fullName, role, id_tenant } = input;
+    const { email, firstName, lastName, role, id_tenant } = input;
 
     return await this.userRepository.create({
       email,
-      fullName,
+      firstName,
+      lastName,
       role,
       passwordHash: hashedPassword,
       tenant: id_tenant ? { connect: { id_tenant } } : undefined,
@@ -58,11 +55,9 @@ export class UserService {
 
   async findOne(id_user: string): Promise<UserResponseDto> {
     const foundUser = await this.userRepository.findById(id_user);
-
     if (!foundUser) {
       throw new NotFoundException('User not found');
     }
-
     return foundUser;
   }
 
@@ -71,26 +66,23 @@ export class UserService {
     includePrivate: boolean = false,
   ): Promise<PrivateUserResponseDto> {
     const foundUser = await this.userRepository.findByEmail(email, includePrivate);
-
     if (!foundUser) {
       throw new NotFoundException('User not found');
     }
-
     return foundUser as PrivateUserResponseDto;
   }
 
   async update(id_user: string, input: UpdateUserDto): Promise<UserResponseDto> {
-    // Check if at least one field is provided for update
     if (
       input.email === undefined &&
-      input.fullName === undefined &&
+      input.firstName === undefined &&
+      input.lastName === undefined &&
       input.role === undefined &&
       input.id_tenant === undefined
     ) {
       throw new BadRequestException('No fields to update');
     }
 
-    // If email is being updated, check if it already exists
     if (input.email) {
       const emailExists = await this.userRepository.existsByEmail(input.email);
       if (emailExists) {
@@ -98,24 +90,19 @@ export class UserService {
       }
     }
 
-    // Check if user exists
     const userExists = await this.userRepository.existsById(id_user);
     if (!userExists) {
       throw new NotFoundException('User not found');
     }
 
-    // Update user with provided fields
     return await this.userRepository.update(id_user, input);
   }
 
   async remove(id_user: string): Promise<UserResponseDto> {
-    // Check if user exists
     const userExists = await this.userRepository.existsById(id_user);
     if (!userExists) {
       throw new NotFoundException('User not found');
     }
-
-    // Delete user
     return await this.userRepository.delete(id_user);
   }
 
@@ -130,4 +117,3 @@ export class UserService {
     return await bcrypt.compare(plainTextPassword, hashedPassword);
   }
 }
-
