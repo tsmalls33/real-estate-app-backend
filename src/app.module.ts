@@ -13,6 +13,7 @@ import { PlanModule } from './plan/plan.module';
 import { PropertyModule } from './property/property.module';
 import { CostModule } from './cost/cost.module';
 import { ReservationModule } from './reservation/reservation.module';
+import { AgentPaymentModule } from './agent-payment/agent-payment.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ReservationModule } from './reservation/reservation.module';
     PropertyModule,
     CostModule,
     ReservationModule,
+    AgentPaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthGuard, RolesGuard],
