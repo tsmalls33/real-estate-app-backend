@@ -15,6 +15,13 @@ const DEFAULT_THEMES = [
     secondary: '#1e1e1e',
     accent: '#bb86fc',
   },
+  {
+    id_theme: 'devomart-default-000001',
+    name: 'Devomart Default',
+    primary: '#F5F5F5',
+    secondary: '#582E39',
+    accent: '#EB4F1C',
+  }
 ];
 
 export async function seedThemes(prisma: PrismaClient) {
