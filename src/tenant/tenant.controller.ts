@@ -4,6 +4,7 @@ import {
   Post,
   Body,
   Put,
+  Patch,
   Param,
   Query,
   Delete,
@@ -55,6 +56,15 @@ export class TenantController {
   @ResponseMessage('Tenant updated successfully')
   update(@Param('id_tenant') id_tenant: string, @Body() updateTenantDto: UpdateTenantDto): Promise<TenantResponseDto> {
     return this.tenantService.update(id_tenant, updateTenantDto);
+  }
+
+  @Patch(':id_tenant/theme')
+  @ResponseMessage('Tenant theme updated successfully')
+  updateTheme(
+    @Param('id_tenant') id_tenant: string,
+    @Body('id_theme') id_theme: string,
+  ): Promise<TenantResponseDto> {
+    return this.tenantService.updateTheme(id_tenant, id_theme);
   }
 
   @Delete(':id_tenant')

@@ -8,6 +8,7 @@ import { TenantModule } from './tenant/tenant.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/auth.guard';
 import { RolesGuard } from './auth/roles.guard';
+import { ThemeModule } from './theme/theme.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { RolesGuard } from './auth/roles.guard';
     UserModule,
     TenantModule,
     AuthModule,
+    ThemeModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthGuard, RolesGuard],
