@@ -18,10 +18,10 @@ export class CreateThemeDto {
 }
 
 export class UpdateThemeDto {
-  name?: string | null;
-  primary?: string | null;
-  secondary?: string | null;
-  accent?: string | null;
+  name?: string;
+  primary?: string;
+  secondary?: string;
+  accent?: string;
   logoIcon?: string | null;
   logoBanner?: string | null;
 }

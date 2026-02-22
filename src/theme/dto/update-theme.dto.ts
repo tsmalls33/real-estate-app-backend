@@ -6,22 +6,22 @@ export class UpdateThemeDto implements SharedUpdateThemeDto {
   @ApiProperty({ required: false, example: 'Default' })
   @IsOptional()
   @IsString()
-  name?: string | null;
+  name?: string;
 
   @ApiProperty({ required: false, example: '#1976d2' })
   @IsOptional()
   @IsString()
-  primary?: string | null;
+  primary?: string;
 
   @ApiProperty({ required: false, example: '#9c27b0' })
   @IsOptional()
   @IsString()
-  secondary?: string | null;
+  secondary?: string;
 
   @ApiProperty({ required: false, example: '#ff9800' })
   @IsOptional()
   @IsString()
-  accent?: string | null;
+  accent?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
