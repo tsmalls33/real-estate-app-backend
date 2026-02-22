@@ -4,9 +4,11 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
+import { UserRoles } from '@RealEstate/types';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './user.repository';
+import { ClientService } from '../client/client.service';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { UserResponseDto, PrivateUserResponseDto } from './dto/user-response.dto';
@@ -18,6 +20,7 @@ export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly configService: ConfigService,
+    private readonly clientService: ClientService,
   ) {
     const raw = this.configService.get<string>('BCRYPT_SALT_ROUNDS') || '10';
     const rounds = Number(raw);
@@ -39,7 +42,7 @@ export class UserService {
     const hashedPassword = await this.hashPassword(input.password);
     const { email, firstName, lastName, role, id_tenant } = input;
 
-    return await this.userRepository.create({
+    const user = await this.userRepository.create({
       email,
       firstName,
       lastName,
@@ -47,6 +50,17 @@ export class UserService {
       passwordHash: hashedPassword,
       tenant: id_tenant ? { connect: { id_tenant } } : undefined,
     });
+
+    // Auto-create a linked Client record for users with CLIENT role
+    if (user.role === UserRoles.CLIENT) {
+      await this.clientService.create({
+        firstName: firstName ?? email.split('@')[0],
+        lastName,
+        id_user: user.id_user,
+      });
+    }
+
+    return user;
   }
 
   async findAll(): Promise<UserResponseDto[]> {
