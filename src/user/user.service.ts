@@ -30,7 +30,6 @@ export class UserService {
       );
     }
     this.saltOrRounds = rounds;
-    console.log(`BCRYPT_SALT_ROUNDS set to: ${this.saltOrRounds}`);
   }
 
   async createUser(input: CreateUserDto): Promise<UserResponseDto> {
