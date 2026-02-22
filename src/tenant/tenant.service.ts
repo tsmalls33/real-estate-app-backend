@@ -6,20 +6,15 @@ import {
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
 import { TenantResponseDto } from './dto/tenant-response.dto';
-import { PrismaService } from '../prisma/prisma.service';
-import { TENANT_PUBLIC_SELECT, TENANT_WITH_USERS_SELECT } from './projections/tenant.projection';
+import { TenantRepository } from './tenant.repository';
 
 
 @Injectable()
 export class TenantService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly tenantRepository: TenantRepository) { }
 
   async createTenant(createTenantDto: CreateTenantDto): Promise<TenantResponseDto> {
-    const isTenantExists = await this.prisma.tenant.findUnique({
-      where: {
-        name: createTenantDto.name,
-      },
-    });
+    const isTenantExists = await this.tenantRepository.existsByName(createTenantDto.name);
 
     if (isTenantExists) throw new ConflictException('Tenant already exists'); // returns 409 Conflict
 
@@ -29,28 +24,20 @@ export class TenantService {
       id_plan: createTenantDto.id_plan,
     };
 
-    return this.prisma.tenant.create({
-      data: dbTenant,
-      select: TENANT_PUBLIC_SELECT
-    });
+    return this.tenantRepository.create(dbTenant) as Promise<TenantResponseDto>;
   }
 
   async findAll(): Promise<TenantResponseDto[]> {
-    return this.prisma.tenant.findMany({
-      select: TENANT_PUBLIC_SELECT
-    });
+    return this.tenantRepository.findAll() as Promise<TenantResponseDto[]>;
   }
 
   async findOne(id_tenant: string, includeUsers: boolean = false): Promise<TenantResponseDto> {
-    const foundTenant = await this.prisma.tenant.findUnique({
-      where: { id_tenant },
-      select: includeUsers ? TENANT_WITH_USERS_SELECT : TENANT_PUBLIC_SELECT,
-    });
+    const foundTenant = await this.tenantRepository.findById(id_tenant, includeUsers);
 
     if (!foundTenant)
       throw new NotFoundException(`Tenant with id '${id_tenant}' not found`); // returns 404 Not Found
 
-    return foundTenant as TenantResponseDto
+    return foundTenant as TenantResponseDto;
   }
 
   async update(id_tenant: string, input: UpdateTenantDto): Promise<TenantResponseDto> {
@@ -65,11 +52,7 @@ export class TenantService {
 
     // check if tenant name is being updated and if it already exists
     if (input.name) {
-      const isTenantExists = await this.prisma.tenant.findUnique({
-        where: {
-          name: input.name,
-        },
-      });
+      const isTenantExists = await this.tenantRepository.existsByName(input.name);
 
       if (isTenantExists) {
         throw new ConflictException(`Tenant name '${input.name}' already exists`);
@@ -77,38 +60,21 @@ export class TenantService {
     }
 
     // check if tenant exists
-    const foundTenant = await this.prisma.tenant.findUnique({
-      where: { id_tenant },
-    });
+    const tenantExists = await this.tenantRepository.existsById(id_tenant);
 
-    if (!foundTenant)
+    if (!tenantExists)
       throw new NotFoundException(`Tenant with id '${id_tenant}' not found`); // returns 404 Not Found
 
-    // update tenant with provided fields
-    const updatedTenant: TenantResponseDto = await this.prisma.tenant.update({
-      where: { id_tenant },
-      data: input,
-      select: TENANT_PUBLIC_SELECT,
-    });
-
-    return updatedTenant;
+    return this.tenantRepository.update(id_tenant, input) as Promise<TenantResponseDto>;
   }
 
   async remove(id_tenant: string): Promise<TenantResponseDto> {
     // check if tenant exists
-    const foundTenant = await this.prisma.tenant.findUnique({
-      where: { id_tenant },
-    });
+    const tenantExists = await this.tenantRepository.existsById(id_tenant);
 
-    if (!foundTenant)
+    if (!tenantExists)
       throw new NotFoundException(`Tenant with '${id_tenant}' not found`); // returns 404 Not Found
 
-    // delete tenant
-    const deletedTenant: TenantResponseDto = await this.prisma.tenant.delete({
-      where: { id_tenant },
-      select: TENANT_PUBLIC_SELECT,
-    });
-
-    return deletedTenant;
+    return this.tenantRepository.delete(id_tenant) as Promise<TenantResponseDto>;
   }
 }

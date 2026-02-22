@@ -1,3 +1,4 @@
+
 import {
   Injectable,
   ConflictException,
@@ -6,87 +7,76 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { UserRepository } from './user.repository';
 import * as bcrypt from 'bcrypt';
-import { USER_PUBLIC_SELECT, USER_AUTH_SELECT } from './projections/user.projection';
 import { ConfigService } from '@nestjs/config';
 import { UserResponseDto, PrivateUserResponseDto } from './dto/user-response.dto';
 
-
 @Injectable()
 export class UserService {
-  private readonly saltOrRounds: number; // Number of salt rounds for bcrypt
+  private readonly saltOrRounds: number;
 
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly configService: ConfigService, // Inject ConfigService for environment variables
+    private readonly userRepository: UserRepository,
+    private readonly configService: ConfigService,
   ) {
-    const raw = this.configService.get<string>('BCRYPT_SALT_ROUNDS') || 10; // Default to 10 if not set
+    const raw = this.configService.get<string>('BCRYPT_SALT_ROUNDS') || '10';
     const rounds = Number(raw);
     if (isNaN(rounds) || rounds < 4 || rounds > 15) {
-      throw new Error(`Invalid BCRYPT_SALT_ROUNDS value: ${raw}. It must be a positive integer between 4 and 15.`);
+      throw new Error(
+        `Invalid BCRYPT_SALT_ROUNDS value: ${raw}. It must be a positive integer between 4 and 15.`,
+      );
     }
-    this.saltOrRounds = rounds; // Set the salt rounds for bcrypt
-    console.log(`BCRYPT_SALT_ROUNDS set to: ${this.saltOrRounds}`); // Log the salt rounds for debugging
+    this.saltOrRounds = rounds;
+    console.log(`BCRYPT_SALT_ROUNDS set to: ${this.saltOrRounds}`);
   }
 
-
   async createUser(input: CreateUserDto): Promise<UserResponseDto> {
-    /**
-    * - Validate user input (handled by class-validator)
-    * - Check if user already exists
-    * - Hash password
-    * - Create user
-    */
-
     // Check if user already exists
-    const isUserExists = await this.prisma.user.findUnique({
-      where: { email: input.email },
-    });
-
-    if (isUserExists) throw new ConflictException('User already exists');
+    const isUserExists = await this.userRepository.existsByEmail(input.email);
+    if (isUserExists) {
+      throw new ConflictException('User already exists');
+    }
 
     // Hash password
     const hashedPassword = await this.hashPassword(input.password);
 
     const { email, fullName, role, id_tenant } = input;
 
-    return await this.prisma.user.create({
-      data: {
-        email,
-        fullName,
-        role,
-        id_tenant,
-        passwordHash: hashedPassword,
-      },
-      select: USER_PUBLIC_SELECT
+    return await this.userRepository.create({
+      email,
+      fullName,
+      role,
+      passwordHash: hashedPassword,
+      tenant: id_tenant ? { connect: { id_tenant } } : undefined,
     });
   }
 
   async findAll(): Promise<UserResponseDto[]> {
-    return await this.prisma.user.findMany({
-      select: USER_PUBLIC_SELECT,
-    });
+    return await this.userRepository.findAll();
   }
 
   async findOne(id_user: string): Promise<UserResponseDto> {
-    const foundUser = await this.prisma.user.findUnique({
-      where: { id_user },
-      select: USER_PUBLIC_SELECT,
-    });
+    const foundUser = await this.userRepository.findById(id_user);
 
-    if (!foundUser) throw new NotFoundException('User not found');
+    if (!foundUser) {
+      throw new NotFoundException('User not found');
+    }
 
     return foundUser;
   }
 
-  async findByEmail(email: string, includePrivate: boolean = false): Promise<PrivateUserResponseDto> {
-    const foundUser = await this.prisma.user.findUnique({
-      where: { email },
-      select: includePrivate ? USER_AUTH_SELECT : USER_PUBLIC_SELECT,
-    });
-    if (!foundUser) throw new NotFoundException('User not found');
-    return foundUser as PrivateUserResponseDto
+  async findByEmail(
+    email: string,
+    includePrivate: boolean = false,
+  ): Promise<PrivateUserResponseDto> {
+    const foundUser = await this.userRepository.findByEmail(email, includePrivate);
+
+    if (!foundUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    return foundUser as PrivateUserResponseDto;
   }
 
   async update(id_user: string, input: UpdateUserDto): Promise<UserResponseDto> {
@@ -102,81 +92,42 @@ export class UserService {
 
     // If email is being updated, check if it already exists
     if (input.email) {
-      const isUserExists = await this.prisma.user.findUnique({
-        where: {
-          email: input.email,
-        },
-      });
-
-      if (isUserExists) {
-        throw new ConflictException(`User email '${input.email}' already exists`);
-      }
-    }
-
-    // If email is being updated, check it doesn't already exist
-    if (input.email) {
-      const existingUserEmail = await this.prisma.user.findUnique({
-        where: { email: input.email },
-      })
-
-      if (existingUserEmail) {
+      const emailExists = await this.userRepository.existsByEmail(input.email);
+      if (emailExists) {
         throw new ConflictException(`User email '${input.email}' already exists`);
       }
     }
 
     // Check if user exists
-    const foundUser = await this.prisma.user.findUnique({
-      where: { id_user },
-    });
-
-    if (!foundUser) throw new NotFoundException('User not found'); // returns 404 Not Found
+    const userExists = await this.userRepository.existsById(id_user);
+    if (!userExists) {
+      throw new NotFoundException('User not found');
+    }
 
     // Update user with provided fields
-    const updatedUser = await this.prisma.user.update({
-      where: { id_user },
-      data: input,
-      select: {
-        id_user: true,
-        email: true,
-        fullName: true,
-        role: true,
-        id_tenant: true,
-      },
-    });
-
-    return updatedUser;
+    return await this.userRepository.update(id_user, input);
   }
 
   async remove(id_user: string): Promise<UserResponseDto> {
     // Check if user exists
-    const foundUser = await this.prisma.user.findUnique({
-      where: { id_user },
-      select: { id_user: true },
-    });
-
-    if (!foundUser) throw new NotFoundException('User not found');
+    const userExists = await this.userRepository.existsById(id_user);
+    if (!userExists) {
+      throw new NotFoundException('User not found');
+    }
 
     // Delete user
-    const deletedUser = await this.prisma.user.delete({
-      where: { id_user },
-      select: USER_PUBLIC_SELECT,
-    });
-
-    return deletedUser;
+    return await this.userRepository.delete(id_user);
   }
 
   async hashPassword(password: string): Promise<string> {
-
-    const saltOrRounds = Number(process.env.BCRYPT_SALT_ROUNDS);
-    if (isNaN(saltOrRounds) || saltOrRounds < 4 || saltOrRounds > 15) {
-      throw new Error(
-        `Invalid BCRYPT_SALT_ROUNDS value: ${saltOrRounds}. It must be a positive integer between 4 and 15.`,
-      );
-    }
-    return await bcrypt.hash(password, saltOrRounds);
+    return await bcrypt.hash(password, this.saltOrRounds);
   }
 
-  async verifyPassword(plainTextPassword: string, hashedPassword: string): Promise<Boolean> {
+  async verifyPassword(
+    plainTextPassword: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
     return await bcrypt.compare(plainTextPassword, hashedPassword);
   }
 }
+

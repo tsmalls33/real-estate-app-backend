@@ -9,6 +9,7 @@
 - [ ] Write spec tests
 - [ ] Separate service and repository for current modules (before making new ones)
 - [ ] Add theme column to Tenant table or add TenantTheme table
+- [ ] Move src/utils to a new package at packages/utils and import from there?
 
 ## DB Models
 
