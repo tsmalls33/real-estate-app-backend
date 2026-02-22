@@ -10,6 +10,7 @@
 - [ ] Separate service and repository for current modules (before making new ones)
 - [ ] Add theme column to Tenant table or add TenantTheme table
 - [ ] Move src/utils to a new package at packages/utils and import from there?
+- [ ] Add validation to prevent orphaned costs. Needs to have or id_property or id_reservation, but not both null. Can be done with a check constraint in the DB and validation in the service layer.
 
 ## DB Models
 
