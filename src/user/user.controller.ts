@@ -7,11 +7,12 @@ import {
   Put,
   Delete,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ResponseMessage } from 'src/common/decorators/response-message.decorator';
+import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRoles } from '@RealEstate/types';
 import { AuthGuard } from '../auth/auth.guard';
@@ -21,7 +22,7 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('User')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @Post()
   @ResponseMessage('User created successfully')
@@ -37,6 +38,14 @@ export class UserController {
   @Roles(UserRoles.ADMIN, UserRoles.SUPERADMIN)
   findAll() {
     return this.userService.findAll();
+  }
+
+  /** GET /user/me — must come before GET /user/:id_user */
+  @Get('me')
+  @ResponseMessage('Profile fetched successfully')
+  @UseGuards(AuthGuard)
+  getMe(@Request() req) {
+    return this.userService.findOne(req.user.sub);
   }
 
   @Get(':id_user')
