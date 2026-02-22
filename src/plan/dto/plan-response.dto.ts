@@ -1,10 +1,9 @@
-import { PlanPeriod } from '../enums/plan-period.enum';
+import { PlanPeriod } from '@RealEstate/types';
 
 export class PlanResponseDto {
   id_plan!: string;
   name!: string;
   price!: number;
-  paymentPeriod!: PlanPeriod;
+  pricePeriod!: PlanPeriod;
   isActive!: boolean;
-  tenantCount?: number;
 }

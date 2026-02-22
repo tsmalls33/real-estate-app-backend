@@ -1,9 +1,9 @@
 import { IsBoolean, IsEnum, IsNumber, IsOptional, IsPositive, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { PlanPeriod } from '@RealEstate/types';
+import { PlanPeriod, CreatePlanDto as SharedCreatePlanDto } from '@RealEstate/types';
 
-export class CreatePlanDto {
+export class CreatePlanDto implements SharedCreatePlanDto {
   @ApiProperty({ required: true, example: 'Premium' })
   @IsString()
   name: string;
@@ -16,7 +16,7 @@ export class CreatePlanDto {
 
   @ApiProperty({ required: true, enum: PlanPeriod, example: PlanPeriod.MONTHLY })
   @IsEnum(PlanPeriod)
-  paymentPeriod: PlanPeriod;
+  pricePeriod: PlanPeriod;
 
   @ApiProperty({ required: false, example: true })
   @IsBoolean()
