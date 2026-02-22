@@ -11,6 +11,7 @@ import { RolesGuard } from './auth/roles.guard';
 import { ThemeModule } from './theme/theme.module';
 import { PlanModule } from './plan/plan.module';
 import { PropertyModule } from './property/property.module';
+import { ClientModule } from './client/client.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { PropertyModule } from './property/property.module';
     ThemeModule,
     PlanModule,
     PropertyModule,
+    ClientModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthGuard, RolesGuard],
