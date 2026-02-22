@@ -1,6 +1,8 @@
 export const PLAN_PUBLIC_SELECT = {
   id_plan: true,
   name: true,
+  price: true,
+  paymentPeriod: true,
   isActive: true,
 } as const;
 

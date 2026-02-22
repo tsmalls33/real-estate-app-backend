@@ -63,10 +63,12 @@ model Theme {
 }
 
 model Plan {
-  id_plan  String   @id @default(uuid())
-  name     String   @unique
-  tenants  Tenant[]
-  isActive Boolean  @default(true)
+  id_plan       String     @id @default(uuid())
+  name          String     @unique
+  price         Decimal    @db.Decimal(10, 2)
+  paymentPeriod PlanPeriod
+  tenants       Tenant[]
+  isActive      Boolean    @default(true)
 }
 
 model Property {
@@ -225,6 +227,11 @@ enum UserRoles {
   SUPERADMIN
   CLIENT
   EMPLOYEE
+}
+
+enum PlanPeriod {
+  MONTHLY
+  YEARLY
 }
 
 enum SaleType {
