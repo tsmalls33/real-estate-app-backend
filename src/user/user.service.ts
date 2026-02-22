@@ -40,11 +40,12 @@ export class UserService {
     }
 
     const hashedPassword = await this.hashPassword(input.password);
-    const { email, fullName, role, id_tenant } = input;
+    const { email, firstName, lastName, role, id_tenant } = input;
 
     const user = await this.userRepository.create({
       email,
-      fullName,
+      firstName,
+      lastName,
       role,
       passwordHash: hashedPassword,
       tenant: id_tenant ? { connect: { id_tenant } } : undefined,
@@ -87,7 +88,8 @@ export class UserService {
   async update(id_user: string, input: UpdateUserDto): Promise<UserResponseDto> {
     if (
       input.email === undefined &&
-      input.fullName === undefined &&
+      input.firstName === undefined &&
+      input.lastName === undefined &&
       input.role === undefined &&
       input.id_tenant === undefined
     ) {

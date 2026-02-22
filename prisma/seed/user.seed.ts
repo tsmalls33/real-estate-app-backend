@@ -4,25 +4,29 @@ import { seedPasswordHash } from './_password';
 const DEFAULT_USERS = [
   {
     email: 'superadmin@gmail.com',
-    fullName: 'Super Admin',
+    firstName: 'Super',
+    lastName: 'Admin',
     role: UserRoles.SUPERADMIN,
     id_tenant: null as string | null,
   },
   {
     email: 'admin@default.com',
-    fullName: 'Default Admin',
+    firstName: 'Default',
+    lastName: 'Admin',
     role: UserRoles.ADMIN,
     id_tenant: 'tenant-seed-0001',
   },
   {
     email: 'admin@devomart.es',
-    fullName: 'Devomart Admin',
+    firstName: 'Devomart',
+    lastName: 'Admin',
     role: UserRoles.ADMIN,
     id_tenant: 'tenant-seed-0002',
   },
   {
     email: 'employee@devomart.es',
-    fullName: 'Devomart Employee',
+    firstName: 'Devomart',
+    lastName: 'Employee',
     role: UserRoles.EMPLOYEE,
     id_tenant: 'tenant-seed-0002',
   },
@@ -36,7 +40,7 @@ export async function seedUsers(prisma: PrismaClient) {
   for (const user of DEFAULT_USERS) {
     await prisma.user.upsert({
       where: { email: user.email },
-      update: { fullName: user.fullName, role: user.role, id_tenant: user.id_tenant },
+      update: { firstName: user.firstName, lastName: user.lastName, role: user.role, id_tenant: user.id_tenant },
       create: { ...user, passwordHash },
     });
   }

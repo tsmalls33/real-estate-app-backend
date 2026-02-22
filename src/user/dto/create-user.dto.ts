@@ -1,21 +1,21 @@
-import { UserRoles, CreateUserDto as SharedCreateUserDto } from "@RealEstate/types";
+import { UserRoles } from '@RealEstate/types';
 import {
-  IsString,
   IsEmail,
-  IsNotEmpty,
-  IsUUID,
-  IsOptional,
-  Matches,
   IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Matches,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 import {
+  NAME_PATTERN,
   PASSWORD_PATTERN,
-  FULL_NAME_PATTERN,
   VALIDATION_MESSAGES,
 } from 'src/utils/validators/validation-patterns';
-import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateUserDto implements SharedCreateUserDto {
+export class CreateUserDto {
   @ApiProperty({ required: true, example: 'john@gmail.com' })
   @IsEmail()
   @IsNotEmpty()
@@ -27,10 +27,15 @@ export class CreateUserDto implements SharedCreateUserDto {
   @Matches(PASSWORD_PATTERN, { message: VALIDATION_MESSAGES.PASSWORD })
   password: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false, example: 'John' })
   @IsOptional()
-  @Matches(FULL_NAME_PATTERN, { message: VALIDATION_MESSAGES.FULL_NAME })
-  fullName?: string;
+  @Matches(NAME_PATTERN, { message: VALIDATION_MESSAGES.NAME })
+  firstName?: string;
+
+  @ApiProperty({ required: false, example: 'Doe' })
+  @IsOptional()
+  @Matches(NAME_PATTERN, { message: VALIDATION_MESSAGES.NAME })
+  lastName?: string;
 
   @IsOptional()
   @IsEnum(UserRoles)
@@ -39,5 +44,5 @@ export class CreateUserDto implements SharedCreateUserDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsUUID()
-  id_tenant?: string; // Optional, if user is created within a tenant context
+  id_tenant?: string;
 }
