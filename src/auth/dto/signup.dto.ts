@@ -5,19 +5,19 @@ import { CreateUserDto, UserRoles } from '@RealEstate/types';
 export class SignUpDto extends SignInDto implements Omit<CreateUserDto, 'email' | 'password'> {
   @IsString()
   @IsOptional()
-  firstName?: string | null;
+  firstName?: string;
 
   @IsString()
   @IsOptional()
-  lastName?: string | null;
+  lastName?: string;
 
   @IsString()
   @IsOptional()
   @IsEnum(UserRoles)
-  role?: UserRoles | null;
+  role?: UserRoles;
 
   @IsString()
   @IsOptional()
   @IsUUID()
-  id_tenant?: string | null;
+  id_tenant?: string;
 }

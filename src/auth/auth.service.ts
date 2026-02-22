@@ -22,7 +22,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async signIn(input: SignInDto): Promise<SignInResponseDto> {
     const { email, password } = input;
