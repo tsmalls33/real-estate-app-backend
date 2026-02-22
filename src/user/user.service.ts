@@ -54,7 +54,8 @@ export class UserService {
     // Auto-create a linked Client record for users with CLIENT role
     if (user.role === UserRoles.CLIENT) {
       await this.clientService.create({
-        firstName: fullName ?? email.split('@')[0],
+        firstName: firstName ?? email.split('@')[0],
+        lastName,
         id_user: user.id_user,
       });
     }
