@@ -11,7 +11,8 @@ export type UserRoles = (typeof UserRoles)[keyof typeof UserRoles]
 export class UserResponseDto {
   id_user!: string;
   email!: string;
-  fullName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
   role!: UserRoles;
   id_tenant?: string | null;
 }
@@ -24,7 +25,8 @@ export class PrivateUserResponseDto extends UserResponseDto {
 export class CreateUserDto {
   email!: string;
   password!: string;
-  fullName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
   role?: UserRoles | null;
   id_tenant?: string | null; // Optional, if user is created within a tenant context
 }
