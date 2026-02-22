@@ -9,11 +9,11 @@ import { seedPlans } from './seed/plan.seed';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Running seeds......')
+  console.log('Running seeds......');
   await seedThemes(prisma);
-  const tenants = await seedTenants(prisma);
-  await seedUsers(prisma, tenants);
-  await seedPlans(prisma)
+  await seedTenants(prisma);
+  await seedUsers(prisma);
+  await seedPlans(prisma);
 }
 
 main()

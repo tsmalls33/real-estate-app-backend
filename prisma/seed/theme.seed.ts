@@ -2,26 +2,26 @@ import { PrismaClient } from '@prisma/client';
 
 const DEFAULT_THEMES = [
   {
-    id_theme: 'theme-default-000001',
+    id_theme: 'theme-seed-0001',
     name: 'Default',
     primary: '#1976d2',
     secondary: '#9c27b0',
     accent: '#ff9800',
   },
   {
-    id_theme: 'theme-dark-000001',
+    id_theme: 'theme-seed-0002',
     name: 'Dark',
     primary: '#121212',
     secondary: '#1e1e1e',
     accent: '#bb86fc',
   },
   {
-    id_theme: 'devomart-default-000001',
+    id_theme: 'theme-seed-0003',
     name: 'Devomart Default',
     primary: '#F5F5F5',
     secondary: '#582E39',
     accent: '#EB4F1C',
-  }
+  },
 ];
 
 export async function seedThemes(prisma: PrismaClient) {

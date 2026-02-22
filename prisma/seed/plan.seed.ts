@@ -1,27 +1,23 @@
 import { PrismaClient, PlanPeriod } from '@prisma/client';
 
-
 const DEFAULT_PLANS = [
   {
-    id_plan: 'basic',
+    id_plan: 'plan-seed-0001',
     name: 'Basic',
     price: 0,
-    pricePeriod: PlanPeriod.MONTHLY
-    // features: ['Access to basic features', 'Limited support'],
+    pricePeriod: PlanPeriod.MONTHLY,
   },
   {
-    id_plan: 'pro',
+    id_plan: 'plan-seed-0002',
     name: 'Pro',
     price: 29.99,
-    pricePeriod: PlanPeriod.MONTHLY
-    // features: ['Access to all features', 'Priority support', 'Customizable themes'],
+    pricePeriod: PlanPeriod.MONTHLY,
   },
   {
-    id_plan: 'premium',
+    id_plan: 'plan-seed-0003',
     name: 'Premium',
     price: 49.99,
-    pricePeriod: PlanPeriod.MONTHLY
-    // features: ['All Pro features', 'Dedicated account manager', 'Custom integrations'],
+    pricePeriod: PlanPeriod.MONTHLY,
   },
 ];
 
@@ -34,8 +30,7 @@ export async function seedPlans(prisma: PrismaClient) {
       update: {
         name: plan.name,
         price: plan.price,
-        pricePeriod: plan.pricePeriod
-        // features: plan.features,
+        pricePeriod: plan.pricePeriod,
       },
       create: plan,
     });
