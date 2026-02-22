@@ -203,7 +203,7 @@ model Client {
   phoneNumber String? @db.VarChar(30)
   notes       String? @db.Text
   id_user     String?
-  isActive    Boolean @default(true)
+  isDeleted   Boolean @default(false)
 
   user User? @relation(fields: [id_user], references: [id_user])
 

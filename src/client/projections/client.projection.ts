@@ -6,7 +6,7 @@ export const CLIENT_SELECT = {
   phoneNumber: true,
   notes: true,
   id_user: true,
-  isActive: true,
+  isDeleted: true,
   createdAt: true,
   updatedAt: true,
 } as const;
