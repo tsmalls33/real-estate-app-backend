@@ -10,8 +10,8 @@ export async function seedTenants(prisma: PrismaClient) {
 
   for (const tenant of DEFAULT_TENANTS) {
     await prisma.tenant.upsert({
-      where: { id_tenant: tenant.id_tenant },
-      update: { name: tenant.name, customDomain: tenant.customDomain },
+      where: { name: tenant.name },
+      update: { id_tenant: tenant.id_tenant, customDomain: tenant.customDomain },
       create: tenant,
     });
   }
