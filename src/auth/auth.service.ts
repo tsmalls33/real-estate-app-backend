@@ -70,7 +70,8 @@ export class AuthService {
       user: {
         id_user: user.id_user,
         email: user.email,
-        fullName: user.fullName,
+        firstName: user.firstName,
+        lastName: user.lastName,
         role: user.role,
         id_tenant: user.id_tenant,
       },
