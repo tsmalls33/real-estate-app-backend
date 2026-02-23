@@ -7,16 +7,21 @@ import { GetAgentPaymentsQueryParams } from './dto/get-agent-payments-query-para
 
 @Injectable()
 export class AgentPaymentService {
-  constructor(private readonly agentPaymentRepository: AgentPaymentRepository) {}
+  constructor(
+    private readonly agentPaymentRepository: AgentPaymentRepository,
+  ) {}
 
   async create(dto: CreateAgentPaymentDto) {
-    return this.agentPaymentRepository.create(dto as Prisma.AgentPaymentUncheckedCreateInput);
+    return this.agentPaymentRepository.create(
+      dto as Prisma.AgentPaymentUncheckedCreateInput,
+    );
   }
 
-  async findAll(query: GetAgentPaymentsQueryParams) {
+  async findAll(query: GetAgentPaymentsQueryParams, tenantId?: string) {
     return this.agentPaymentRepository.findAll({
       isPaid: query.isPaid,
       id_user: query.id_user,
+      id_tenant: tenantId,
       startDate: query.startDate,
       endDate: query.endDate,
       page: query.page ?? 1,
@@ -25,14 +30,22 @@ export class AgentPaymentService {
   }
 
   async findOne(id_agent_payment: string) {
-    const payment = await this.agentPaymentRepository.findById(id_agent_payment);
-    if (!payment) throw new NotFoundException(`AgentPayment '${id_agent_payment}' not found`);
+    const payment =
+      await this.agentPaymentRepository.findById(id_agent_payment);
+    if (!payment)
+      throw new NotFoundException(
+        `AgentPayment '${id_agent_payment}' not found`,
+      );
     return payment;
   }
 
   async update(id_agent_payment: string, dto: UpdateAgentPaymentDto) {
-    const exists = await this.agentPaymentRepository.existsById(id_agent_payment);
-    if (!exists) throw new NotFoundException(`AgentPayment '${id_agent_payment}' not found`);
+    const exists =
+      await this.agentPaymentRepository.existsById(id_agent_payment);
+    if (!exists)
+      throw new NotFoundException(
+        `AgentPayment '${id_agent_payment}' not found`,
+      );
     return this.agentPaymentRepository.update(
       id_agent_payment,
       dto as Prisma.AgentPaymentUncheckedUpdateInput,
@@ -40,8 +53,12 @@ export class AgentPaymentService {
   }
 
   async remove(id_agent_payment: string) {
-    const exists = await this.agentPaymentRepository.existsById(id_agent_payment);
-    if (!exists) throw new NotFoundException(`AgentPayment '${id_agent_payment}' not found`);
+    const exists =
+      await this.agentPaymentRepository.existsById(id_agent_payment);
+    if (!exists)
+      throw new NotFoundException(
+        `AgentPayment '${id_agent_payment}' not found`,
+      );
     return this.agentPaymentRepository.delete(id_agent_payment);
   }
 }

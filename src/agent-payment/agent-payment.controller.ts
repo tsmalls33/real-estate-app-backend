@@ -7,6 +7,7 @@ import {
   Body,
   Param,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -27,8 +28,8 @@ export class AgentPaymentController {
   constructor(private readonly agentPaymentService: AgentPaymentService) {}
 
   @Get()
-  findAll(@Query() query: GetAgentPaymentsQueryParams) {
-    return this.agentPaymentService.findAll(query);
+  findAll(@Query() query: GetAgentPaymentsQueryParams, @Req() req: any) {
+    return this.agentPaymentService.findAll(query, req.user?.tenantId);
   }
 
   @Get(':id')

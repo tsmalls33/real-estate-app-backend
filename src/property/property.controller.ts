@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -49,9 +50,11 @@ export class PropertyController {
   @Get()
   @ResponseMessage('Properties fetched successfully')
   findAll(
-    @Query(new ValidationPipe({ transform: true })) query: GetPropertiesQueryParams,
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetPropertiesQueryParams,
+    @Req() req: any,
   ) {
-    return this.propertyService.findAll(query);
+    return this.propertyService.findAll(query, req.user?.tenantId);
   }
 
   /** GET /properties/:id_property */
@@ -84,7 +87,8 @@ export class PropertyController {
   @ResponseMessage('Reservations fetched successfully')
   findReservations(
     @Param('id_property') id_property: string,
-    @Query(new ValidationPipe({ transform: true })) query: GetReservationsQueryParams,
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetReservationsQueryParams,
   ) {
     return this.propertyService.findReservations(id_property, query);
   }
@@ -112,10 +116,7 @@ export class PropertyController {
   /** PATCH /properties/:id_property/costs/:id_cost */
   @Patch(':id_property/costs/:id_cost')
   @ResponseMessage('Cost updated successfully')
-  updateCost(
-    @Param('id_cost') id_cost: string,
-    @Body() dto: UpdateCostDto,
-  ) {
+  updateCost(@Param('id_cost') id_cost: string, @Body() dto: UpdateCostDto) {
     return this.costService.update(id_cost, dto);
   }
 

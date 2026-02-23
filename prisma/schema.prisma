@@ -39,10 +39,12 @@ model Tenant {
   updatedAt    DateTime @default(now()) @updatedAt
   isDeleted    Boolean  @default(false)
 
-  users      User[]     @relation("TenantUsers")
-  plan       Plan?      @relation(fields: [id_plan], references: [id_plan])
-  theme      Theme?     @relation(fields: [id_theme], references: [id_theme])
-  properties Property[] @relation("TenantProperties")
+  users         User[]         @relation("TenantUsers")
+  plan          Plan?          @relation(fields: [id_plan], references: [id_plan])
+  theme         Theme?         @relation(fields: [id_theme], references: [id_theme])
+  properties    Property[]     @relation("TenantProperties")
+  clients       Client[]
+  agentPayments AgentPayment[]
 }
 
 model Theme {
@@ -73,7 +75,7 @@ model Plan {
 
 model Property {
   id_property         String         @id @default(uuid())
-  propertyName        String         @unique
+  propertyName        String
   propertyAddress     String         @db.VarChar(500)
   propertyDescription String?        @db.VarChar(2000)
   coverImage          String?
@@ -99,6 +101,7 @@ model Property {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
+  @@unique([propertyName, id_tenant])
   @@index([id_tenant])
   @@index([id_owner])
   @@index([saleType])
@@ -173,11 +176,15 @@ model AgentPayment {
   amount           Decimal  @db.Decimal(10, 2)
   isPaid           Boolean  @default(false)
   id_user          String
+  id_tenant        String?
 
-  user User @relation(fields: [id_user], references: [id_user])
+  user   User    @relation(fields: [id_user], references: [id_user])
+  tenant Tenant? @relation(fields: [id_tenant], references: [id_tenant])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([id_tenant])
 }
 
 model Photo {
@@ -203,12 +210,16 @@ model Client {
   phoneNumber String? @db.VarChar(30)
   notes       String? @db.Text
   id_user     String?
+  id_tenant   String?
   isDeleted   Boolean @default(false)
 
-  user User? @relation(fields: [id_user], references: [id_user])
+  user   User?   @relation(fields: [id_user], references: [id_user])
+  tenant Tenant? @relation(fields: [id_tenant], references: [id_tenant])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([id_tenant])
 }
 
 model FeeRule {

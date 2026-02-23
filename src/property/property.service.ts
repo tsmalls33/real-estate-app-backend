@@ -12,14 +12,16 @@ export class PropertyService {
   constructor(private readonly propertyRepository: PropertyRepository) {}
 
   async create(dto: CreatePropertyDto) {
-    return this.propertyRepository.create(dto as Prisma.PropertyUncheckedCreateInput);
+    return this.propertyRepository.create(
+      dto as Prisma.PropertyUncheckedCreateInput,
+    );
   }
 
-  async findAll(query: GetPropertiesQueryParams) {
+  async findAll(query: GetPropertiesQueryParams, tenantId?: string) {
     return this.propertyRepository.findAll({
       status: query.status,
       saleType: query.saleType,
-      id_tenant: query.id_tenant,
+      id_tenant: tenantId ?? query.id_tenant,
       id_agent: query.id_agent,
       page: query.page ?? 1,
       limit: query.limit ?? 20,
@@ -29,14 +31,18 @@ export class PropertyService {
   async findOne(id_property: string) {
     const property = await this.propertyRepository.findById(id_property);
     if (!property)
-      throw new NotFoundException(`Property with id '${id_property}' not found`);
+      throw new NotFoundException(
+        `Property with id '${id_property}' not found`,
+      );
     return property;
   }
 
   async update(id_property: string, dto: UpdatePropertyDto) {
     const exists = await this.propertyRepository.existsById(id_property);
     if (!exists)
-      throw new NotFoundException(`Property with id '${id_property}' not found`);
+      throw new NotFoundException(
+        `Property with id '${id_property}' not found`,
+      );
 
     return this.propertyRepository.update(
       id_property,
@@ -47,7 +53,9 @@ export class PropertyService {
   async remove(id_property: string) {
     const exists = await this.propertyRepository.existsById(id_property);
     if (!exists)
-      throw new NotFoundException(`Property with id '${id_property}' not found`);
+      throw new NotFoundException(
+        `Property with id '${id_property}' not found`,
+      );
     return this.propertyRepository.softDelete(id_property);
   }
 
@@ -57,7 +65,9 @@ export class PropertyService {
   ) {
     const exists = await this.propertyRepository.existsById(id_property);
     if (!exists)
-      throw new NotFoundException(`Property with id '${id_property}' not found`);
+      throw new NotFoundException(
+        `Property with id '${id_property}' not found`,
+      );
     return this.propertyRepository.findReservations(id_property, {
       startDate: query.startDate,
       endDate: query.endDate,
@@ -65,5 +75,4 @@ export class PropertyService {
       platform: query.platform,
     });
   }
-
 }

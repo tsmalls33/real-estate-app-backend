@@ -8,22 +8,28 @@ export class AgentPaymentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: Prisma.AgentPaymentUncheckedCreateInput) {
-    return this.prisma.agentPayment.create({ data, select: AGENT_PAYMENT_SELECT });
+    return this.prisma.agentPayment.create({
+      data,
+      select: AGENT_PAYMENT_SELECT,
+    });
   }
 
   async findAll(params: {
     isPaid?: boolean;
     id_user?: string;
+    id_tenant?: string;
     startDate?: string;
     endDate?: string;
     page: number;
     limit: number;
   }) {
-    const { isPaid, id_user, startDate, endDate, page, limit } = params;
+    const { isPaid, id_user, id_tenant, startDate, endDate, page, limit } =
+      params;
 
     const where: Prisma.AgentPaymentWhereInput = {
       ...(isPaid !== undefined && { isPaid }),
       ...(id_user && { id_user }),
+      ...(id_tenant && { id_tenant }),
       ...((startDate || endDate) && {
         dueDate: {
           ...(startDate && { gte: new Date(startDate) }),
@@ -60,7 +66,10 @@ export class AgentPaymentRepository {
     });
   }
 
-  async update(id_agent_payment: string, data: Prisma.AgentPaymentUncheckedUpdateInput) {
+  async update(
+    id_agent_payment: string,
+    data: Prisma.AgentPaymentUncheckedUpdateInput,
+  ) {
     return this.prisma.agentPayment.update({
       where: { id_agent_payment },
       data,

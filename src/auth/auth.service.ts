@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { SignInDto, SignInResponseDto } from './dto/signin.dto';
@@ -20,7 +17,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async signIn(input: SignInDto): Promise<SignInResponseDto> {
     const { email, password } = input;
@@ -53,7 +50,12 @@ export class AuthService {
       throw new Error('JWT secrets are not configured');
     }
 
-    const payload = { sub: user.id_user, email: user.email, role: user.role };
+    const payload = {
+      sub: user.id_user,
+      email: user.email,
+      role: user.role,
+      tenantId: user.id_tenant,
+    };
 
     const accessToken = await this.generateToken(
       this.jwtSecret,
@@ -115,7 +117,12 @@ export class AuthService {
     }
 
     const currentUser = await this.userService.findOne(verifiedToken.sub);
-    const payload = { sub: currentUser.id_user, email: currentUser.email, role: currentUser.role };
+    const payload = {
+      sub: currentUser.id_user,
+      email: currentUser.email,
+      role: currentUser.role,
+      tenantId: currentUser.id_tenant,
+    };
 
     const newAccessToken = await this.generateToken(
       this.jwtSecret,

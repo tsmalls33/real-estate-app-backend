@@ -13,13 +13,15 @@ export class ClientRepository {
 
   async findAll(params: {
     search?: string;
+    id_tenant?: string;
     page: number;
     limit: number;
   }) {
-    const { search, page, limit } = params;
+    const { search, id_tenant, page, limit } = params;
 
     const where: Prisma.ClientWhereInput = {
       isDeleted: false,
+      ...(id_tenant && { id_tenant }),
       ...(search && {
         OR: [
           { firstName: { contains: search, mode: 'insensitive' } },
