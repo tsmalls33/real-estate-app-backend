@@ -4,14 +4,16 @@ import {
   Body,
   Get,
   Param,
-  Put,
+  Patch,
   Delete,
+  Query,
   UseGuards,
   Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { GetUsersQueryParams } from './dto/get-users-query-params';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRoles } from '@RealEstate/types';
@@ -36,8 +38,8 @@ export class UserController {
   @ResponseMessage('Users fetched successfully')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRoles.ADMIN, UserRoles.SUPERADMIN)
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Query() query: GetUsersQueryParams) {
+    return this.userService.findAll(query.page, query.limit);
   }
 
   /** GET /user/me — must come before GET /user/:id_user */
@@ -64,7 +66,7 @@ export class UserController {
     return this.userService.findAgentPayments(id_user);
   }
 
-  @Put(':id_user')
+  @Patch(':id_user')
   @ResponseMessage('User updated successfully')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRoles.ADMIN, UserRoles.SUPERADMIN)

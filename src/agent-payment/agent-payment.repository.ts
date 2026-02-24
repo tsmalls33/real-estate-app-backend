@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { AGENT_PAYMENT_SELECT } from './projections/agent-payment.projection';
 
 @Injectable()
@@ -59,11 +59,12 @@ export class AgentPaymentRepository {
     });
   }
 
-  async existsById(id_agent_payment: string) {
-    return this.prisma.agentPayment.findUnique({
+  async existsById(id_agent_payment: string): Promise<boolean> {
+    const record = await this.prisma.agentPayment.findUnique({
       where: { id_agent_payment },
       select: { id_agent_payment: true },
     });
+    return record !== null;
   }
 
   async update(

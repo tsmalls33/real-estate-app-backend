@@ -3,13 +3,12 @@ import {
   Get,
   Post,
   Body,
-  Put,
   Patch,
   Param,
   Query,
   Delete,
   UseGuards,
-  ValidationPipe
+  ValidationPipe,
 } from '@nestjs/common';
 import { TenantService } from './tenant.service';
 import { CreateTenantDto } from './dto/create-tenant.dto';
@@ -52,7 +51,7 @@ export class TenantController {
     return this.tenantService.findOne(id_tenant, includeUsers);
   }
 
-  @Put(':id_tenant')
+  @Patch(':id_tenant')
   @ResponseMessage('Tenant updated successfully')
   update(@Param('id_tenant') id_tenant: string, @Body() updateTenantDto: UpdateTenantDto): Promise<TenantResponseDto> {
     return this.tenantService.update(id_tenant, updateTenantDto);
