@@ -7,6 +7,7 @@ import {
   Body,
   Param,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -27,8 +28,8 @@ export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
   @Get()
-  findAll(@Query() query: GetClientsQueryParams) {
-    return this.clientService.findAll(query);
+  findAll(@Query() query: GetClientsQueryParams, @Req() req: any) {
+    return this.clientService.findAll(query, req.user?.tenantId);
   }
 
   @Get(':id')

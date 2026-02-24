@@ -10,12 +10,15 @@ export class ClientService {
   constructor(private readonly clientRepository: ClientRepository) {}
 
   async create(dto: CreateClientDto) {
-    return this.clientRepository.create(dto as Prisma.ClientUncheckedCreateInput);
+    return this.clientRepository.create(
+      dto as Prisma.ClientUncheckedCreateInput,
+    );
   }
 
-  async findAll(query: GetClientsQueryParams) {
+  async findAll(query: GetClientsQueryParams, tenantId?: string) {
     return this.clientRepository.findAll({
       search: query.search,
+      id_tenant: tenantId,
       page: query.page ?? 1,
       limit: query.limit ?? 20,
     });
@@ -30,7 +33,10 @@ export class ClientService {
   async update(id_client: string, dto: UpdateClientDto) {
     const exists = await this.clientRepository.existsById(id_client);
     if (!exists) throw new NotFoundException(`Client '${id_client}' not found`);
-    return this.clientRepository.update(id_client, dto as Prisma.ClientUncheckedUpdateInput);
+    return this.clientRepository.update(
+      id_client,
+      dto as Prisma.ClientUncheckedUpdateInput,
+    );
   }
 
   async remove(id_client: string) {

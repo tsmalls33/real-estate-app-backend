@@ -1,6 +1,15 @@
-import { IsEmail, IsOptional, IsString, IsUUID, Matches } from 'class-validator';
+import {
+  IsEmail,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Matches,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { NAME_PATTERN, VALIDATION_MESSAGES } from 'src/utils/validators/validation-patterns';
+import {
+  NAME_PATTERN,
+  VALIDATION_MESSAGES,
+} from 'src/utils/validators/validation-patterns';
 
 export class CreateClientDto {
   @ApiProperty({ example: 'John' })
@@ -32,4 +41,9 @@ export class CreateClientDto {
   @IsOptional()
   @IsUUID()
   id_user?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsUUID()
+  id_tenant?: string;
 }

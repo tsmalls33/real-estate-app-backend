@@ -4,6 +4,7 @@ export const AGENT_PAYMENT_SELECT = {
   amount: true,
   isPaid: true,
   id_user: true,
+  id_tenant: true,
   createdAt: true,
   updatedAt: true,
 } as const;

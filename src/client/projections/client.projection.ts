@@ -6,6 +6,7 @@ export const CLIENT_SELECT = {
   phoneNumber: true,
   notes: true,
   id_user: true,
+  id_tenant: true,
   isDeleted: true,
   createdAt: true,
   updatedAt: true,
