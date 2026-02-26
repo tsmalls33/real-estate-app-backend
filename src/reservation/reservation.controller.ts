@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -15,17 +17,59 @@ import { UserRoles } from '@RealEstate/types';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { CostService } from '../cost/cost.service';
 import { CreateReservationCostDto } from '../cost/dto/create-reservation-cost.dto';
 import { UpdateCostDto } from '../cost/dto/update-cost.dto';
 import { GetCostsQueryParams } from '../cost/dto/get-costs-query-params';
+import { ReservationService } from './reservation.service';
+import { UpdateReservationDto } from './dto/update-reservation.dto';
+import { UpdateReservationStatusDto } from './dto/update-reservation-status.dto';
 
 @ApiTags('Reservation')
 @UseGuards(AuthGuard, RolesGuard)
 @Roles(UserRoles.SUPERADMIN)
 @Controller('reservations')
 export class ReservationController {
-  constructor(private readonly costService: CostService) {}
+  constructor(
+    private readonly reservationService: ReservationService,
+    private readonly costService: CostService,
+  ) {}
+
+  /** GET /reservations/:id_reservation */
+  @Get(':id_reservation')
+  @ResponseMessage('Reservation fetched successfully')
+  findOne(@Param('id_reservation') id_reservation: string) {
+    return this.reservationService.findOne(id_reservation);
+  }
+
+  /** PATCH /reservations/:id_reservation */
+  @Patch(':id_reservation')
+  @ResponseMessage('Reservation updated successfully')
+  update(
+    @Param('id_reservation') id_reservation: string,
+    @Body() dto: UpdateReservationDto,
+  ) {
+    return this.reservationService.update(id_reservation, dto);
+  }
+
+  /** PATCH /reservations/:id_reservation/status */
+  @Patch(':id_reservation/status')
+  @ResponseMessage('Reservation status updated successfully')
+  updateStatus(
+    @Param('id_reservation') id_reservation: string,
+    @Body() dto: UpdateReservationStatusDto,
+  ) {
+    return this.reservationService.updateStatus(id_reservation, dto.status);
+  }
+
+  /** PATCH /reservations/:id_reservation/cancel */
+  @Patch(':id_reservation/cancel')
+  @HttpCode(HttpStatus.OK)
+  @ResponseMessage('Reservation cancelled successfully')
+  cancel(@Param('id_reservation') id_reservation: string) {
+    return this.reservationService.cancel(id_reservation);
+  }
 
   /** GET /reservations/:id_reservation/costs */
   @Get(':id_reservation/costs')
