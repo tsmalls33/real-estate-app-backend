@@ -111,14 +111,13 @@ model PropertyStats {
   id_property_stats String       @id @default(uuid())
   id_property       String       @unique
   numberOfBedrooms  Int
-  numberOfBathrooms Int
-  sizeSquareMeters  Decimal      @db.Decimal(10, 2)
+  numberOfBathrooms Decimal      @db.Decimal(3, 1)
+  sizeSquareMeters  Decimal?      @db.Decimal(10, 2)
   propertyType      PropertyType
-  location          String
-  yearBuilt         Int
+  yearBuilt         Int?
   floorNumber       Int?
-  hasElevator       Boolean
-  hasGarage         Boolean
+  hasElevator       Boolean?
+  hasGarage         Boolean?
   isDeleted         Boolean      @default(false)
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @default(now()) @updatedAt

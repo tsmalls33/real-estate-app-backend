@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { CreatePropertyStatsDto as SharedCreatePropertyStatsDto, PropertyType } from '@RealEstate/types';
@@ -14,23 +14,21 @@ export class CreatePropertyStatsDto implements SharedCreatePropertyStatsDto {
   @Type(() => Number)
   numberOfBathrooms!: number;
 
-  @ApiProperty({ example: 75.5 })
-  @IsNumber({ maxDecimalPlaces: 2 })
-  @Type(() => Number)
-  sizeSquareMeters!: number;
-
   @ApiProperty({ enum: PropertyType })
   @IsEnum(PropertyType)
   propertyType!: PropertyType;
 
-  @ApiProperty({ example: 'Barcelona, Eixample' })
-  @IsString()
-  location!: string;
+  @ApiProperty({ example: 75.5 })
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Type(() => Number)
+  @IsOptional()
+  sizeSquareMeters?: number;
 
   @ApiProperty({ example: 2005 })
   @IsNumber()
   @Type(() => Number)
-  yearBuilt!: number;
+  @IsOptional()
+  yearBuilt?: number;
 
   @ApiProperty({ required: false })
   @IsOptional()
@@ -40,9 +38,11 @@ export class CreatePropertyStatsDto implements SharedCreatePropertyStatsDto {
 
   @ApiProperty({ example: true })
   @IsBoolean()
-  hasElevator!: boolean;
+  @IsOptional()
+  hasElevator?: boolean;
 
   @ApiProperty({ example: true })
   @IsBoolean()
-  hasGarage!: boolean;
+  @IsOptional()
+  hasGarage?: boolean;
 }

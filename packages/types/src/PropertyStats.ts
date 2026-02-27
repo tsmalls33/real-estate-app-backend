@@ -9,21 +9,19 @@ export type PropertyType = (typeof PropertyType)[keyof typeof PropertyType];
 export class CreatePropertyStatsDto {
   numberOfBedrooms!: number;
   numberOfBathrooms!: number;
-  sizeSquareMeters!: number;
   propertyType!: PropertyType;
-  location!: string;
-  yearBuilt!: number;
+  sizeSquareMeters?: number;
+  yearBuilt?: number;
   floorNumber?: number;
-  hasElevator!: boolean;
-  hasGarage!: boolean;
+  hasElevator?: boolean;
+  hasGarage?: boolean;
 }
 
 export class UpdatePropertyStatsDto {
   numberOfBedrooms?: number;
   numberOfBathrooms?: number;
-  sizeSquareMeters?: number;
   propertyType?: PropertyType;
-  location?: string;
+  sizeSquareMeters?: number;
   yearBuilt?: number;
   floorNumber?: number;
   hasElevator?: boolean;
@@ -35,13 +33,12 @@ export class PropertyStatsResponseDto {
   id_property!: string;
   numberOfBedrooms!: number;
   numberOfBathrooms!: number;
-  sizeSquareMeters!: number;
   propertyType!: PropertyType;
-  location!: string;
-  yearBuilt!: number;
-  floorNumber!: number | null;
-  hasElevator!: boolean;
-  hasGarage!: boolean;
+  sizeSquareMeters?: number;
+  yearBuilt?: number;
+  floorNumber?: number | null;
+  hasElevator?: boolean;
+  hasGarage?: boolean;
   createdAt!: Date;
   updatedAt!: Date;
 }
