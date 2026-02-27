@@ -10,9 +10,9 @@ import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { ForwardReservationStatus } from './dto/update-reservation-status.dto';
 
-const VALID_TRANSITIONS: Partial<Record<ReservationStatus, ReservationStatus>> = {
-  [ReservationStatus.UPCOMING]: ReservationStatus.ACTIVE,
-  [ReservationStatus.ACTIVE]: ReservationStatus.COMPLETED,
+const VALID_TRANSITIONS: Partial<Record<ReservationStatus, ForwardReservationStatus>> = {
+  [ReservationStatus.UPCOMING]: ForwardReservationStatus.ACTIVE,
+  [ReservationStatus.ACTIVE]: ForwardReservationStatus.COMPLETED,
 };
 
 @Injectable()
@@ -104,7 +104,7 @@ export class ReservationService {
       throw new NotFoundException(`Reservation with id '${id_reservation}' not found`);
 
     const allowedNext = VALID_TRANSITIONS[existing.status];
-    if (allowedNext !== (newStatus as unknown as ReservationStatus))
+    if (allowedNext !== newStatus)
       throw new BadRequestException(
         `Cannot transition from '${existing.status}' to '${newStatus}'. ` +
           `Allowed: ${allowedNext ? `'${existing.status}' → '${allowedNext}'` : 'none'}`,
@@ -112,7 +112,7 @@ export class ReservationService {
 
     return this.reservationRepository.updateStatus(
       id_reservation,
-      newStatus as unknown as ReservationStatus,
+      newStatus as ReservationStatus,
     );
   }
 
