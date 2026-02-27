@@ -62,8 +62,8 @@ export class UserService {
     return user;
   }
 
-  async findAll(): Promise<UserResponseDto[]> {
-    return await this.userRepository.findAll();
+  async findAll(page = 1, limit = 20) {
+    return this.userRepository.findWithPagination(page, limit, { isDeleted: false });
   }
 
   async findOne(id_user: string): Promise<UserResponseDto> {
