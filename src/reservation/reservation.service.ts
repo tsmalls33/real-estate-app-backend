@@ -5,7 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ReservationStatus } from '@prisma/client';
-import { Platform } from '@RealEstate/types';
 import { ReservationRepository } from './reservation.repository';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
@@ -95,7 +94,7 @@ export class ReservationService {
       ...(dto.startDate !== undefined && { startDate }),
       ...(dto.endDate !== undefined && { endDate }),
       ...(dto.totalCost !== undefined && { totalCost: dto.totalCost }),
-      ...(dto.platform !== undefined && { platform: dto.platform as Platform }),
+      ...(dto.platform !== undefined && { platform: dto.platform }),
     });
   }
 
