@@ -4,6 +4,7 @@ import {
   Prisma,
   Property,
   PropertyStatus,
+  Reservation,
   ReservationStatus,
   SaleType,
 } from '@prisma/client';
@@ -101,7 +102,7 @@ export class PropertyRepository {
       page: number;
       limit: number;
     },
-  ): Promise<{ data: unknown[]; total: number }> {
+  ): Promise<{ data: Reservation[]; total: number }> {
     const { page, limit, startDate, endDate, status, platform } = filters;
 
     const where = {
