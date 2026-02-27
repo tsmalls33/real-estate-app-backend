@@ -2,7 +2,6 @@ export const PropertyType = {
   APARTMENT: 'APARTMENT',
   HOUSE: 'HOUSE',
   VILLA: 'VILLA'
-  ROOM: 'ROOM',
 } as const;
 
 export type PropertyType = (typeof PropertyType)[keyof typeof PropertyType];
