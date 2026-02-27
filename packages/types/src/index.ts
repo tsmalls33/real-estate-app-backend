@@ -3,4 +3,5 @@ export * from './Tenant';
 export * from './Theme';
 export * from './Plan';
 export * from './Cost';
-export * from './AgentPayments'
+export * from './AgentPayments';
+export * from './Reservation';
