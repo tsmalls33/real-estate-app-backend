@@ -51,7 +51,7 @@ export class ReservationResponseDto {
   totalCost!: number;
   platform!: Platform;
   status!: ReservationStatus;
-  dateCancelled!: Date | null;
+  dateCancelled?: Date;
   createdAt!: Date;
   updatedAt!: Date;
 }
