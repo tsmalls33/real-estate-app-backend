@@ -94,7 +94,7 @@ export class ReservationService {
       ...(dto.startDate !== undefined && { startDate }),
       ...(dto.endDate !== undefined && { endDate }),
       ...(dto.totalCost !== undefined && { totalCost: dto.totalCost }),
-      ...(dto.platform !== undefined && { platform: dto.platform as any }),
+      ...(dto.platform !== undefined && { platform: dto.platform }),
     });
   }
 
