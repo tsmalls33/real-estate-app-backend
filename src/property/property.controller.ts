@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -24,6 +25,8 @@ import { UpdatePropertyDto } from './dto/update-property.dto';
 import { GetPropertiesQueryParams } from './dto/get-properties-query-params';
 import { GetReservationsQueryParams } from './dto/get-reservations-query-params';
 import { PropertyService } from './property.service';
+import { PropertyStatsService } from './property-stats.service';
+import { CreatePropertyStatsDto } from './dto/create-property-stats.dto';
 import { CostService } from '../cost/cost.service';
 import { CreatePropertyCostDto } from '../cost/dto/create-property-cost.dto';
 import { UpdateCostDto } from '../cost/dto/update-cost.dto';
@@ -36,6 +39,7 @@ import { GetCostsQueryParams } from '../cost/dto/get-costs-query-params';
 export class PropertyController {
   constructor(
     private readonly propertyService: PropertyService,
+    private readonly propertyStatsService: PropertyStatsService,
     private readonly costService: CostService,
   ) {}
 
@@ -80,6 +84,16 @@ export class PropertyController {
   @ResponseMessage('Property deleted successfully')
   remove(@Param('id_property') id_property: string) {
     return this.propertyService.remove(id_property);
+  }
+
+  /** PUT /properties/:id_property/stats */
+  @Put(':id_property/stats')
+  @ResponseMessage('Property stats saved successfully')
+  upsertStats(
+    @Param('id_property') id_property: string,
+    @Body() dto: CreatePropertyStatsDto,
+  ) {
+    return this.propertyStatsService.upsert(id_property, dto);
   }
 
   /** GET /properties/:id_property/reservations */
