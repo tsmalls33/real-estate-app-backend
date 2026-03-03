@@ -114,6 +114,7 @@ model PropertyStats {
   numberOfBathrooms Decimal      @db.Decimal(3, 1)
   sizeSquareMeters  Decimal?      @db.Decimal(10, 2)
   propertyType      PropertyType
+  neighborhood      String?
   yearBuilt         Int?
   floorNumber       String?
   hasElevator       Boolean?

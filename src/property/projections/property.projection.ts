@@ -4,6 +4,7 @@ export const PROPERTY_STATS_SELECT = {
   numberOfBathrooms: true,
   sizeSquareMeters: true,
   propertyType: true,
+  neighborhood: true,
   yearBuilt: true,
   floorNumber: true,
   hasElevator: true,

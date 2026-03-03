@@ -10,6 +10,7 @@ export class CreatePropertyStatsDto {
   numberOfBedrooms!: number;
   numberOfBathrooms!: number;
   propertyType!: PropertyType;
+  neighborhood?: string;
   sizeSquareMeters?: number;
   yearBuilt?: number;
   floorNumber?: string;
@@ -23,6 +24,7 @@ export class PropertyStatsResponseDto {
   numberOfBedrooms!: number;
   numberOfBathrooms!: number;
   propertyType!: PropertyType;
+  neighborhood?: string;
   sizeSquareMeters?: number;
   yearBuilt?: number;
   floorNumber?: string;

@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, IsNumber, IsOptional } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { CreatePropertyStatsDto as SharedCreatePropertyStatsDto, PropertyType } from '@RealEstate/types';
@@ -17,6 +17,11 @@ export class CreatePropertyStatsDto implements SharedCreatePropertyStatsDto {
   @ApiProperty({ enum: PropertyType })
   @IsEnum(PropertyType)
   propertyType!: PropertyType;
+
+  @ApiProperty({ required: false, example: 'Downtown' })
+  @IsString()
+  @IsOptional()
+  neighborhood?: string;
 
   @ApiProperty({ example: 75.5 })
   @IsNumber({ maxDecimalPlaces: 2 })

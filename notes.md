@@ -68,7 +68,7 @@
 | numberOfBathrooms | number | Total bathrooms (full + half) |
 | sizeSquareMeters | number | Living area in square meters |
 | propertyType | enum | Type (APARTMENT, HOUSE, VILLA, etc.) |
-| location | string | city/neighborhood |
+| neighborhood | string | Neighborhood name (optional) |
 | yearBuilt | number | Construction year |
 | floorNumber | number | Floor level in building |
 | hasElevator | boolean | Building has elevator |
