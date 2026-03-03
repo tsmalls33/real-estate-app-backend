@@ -12,14 +12,14 @@ export class PropertyStatsRepository {
     });
   }
 
-  async create(data: Prisma.PropertyStatsUncheckedCreateInput): Promise<PropertyStats> {
-    return this.prisma.propertyStats.create({ data });
-  }
-
-  async updateByPropertyId(
+  async upsert(
     id_property: string,
-    data: Prisma.PropertyStatsUncheckedUpdateInput,
+    data: Prisma.PropertyStatsUncheckedCreateInput,
   ): Promise<PropertyStats> {
-    return this.prisma.propertyStats.update({ where: { id_property }, data });
+    return this.prisma.propertyStats.upsert({
+      where: { id_property },
+      create: data,
+      update: data,
+    });
   }
 }

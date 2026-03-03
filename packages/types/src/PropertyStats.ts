@@ -17,17 +17,6 @@ export class CreatePropertyStatsDto {
   hasGarage?: boolean;
 }
 
-export class UpdatePropertyStatsDto {
-  numberOfBedrooms?: number;
-  numberOfBathrooms?: number;
-  propertyType?: PropertyType;
-  sizeSquareMeters?: number;
-  yearBuilt?: number;
-  floorNumber?: string;
-  hasElevator?: boolean;
-  hasGarage?: boolean;
-}
-
 export class PropertyStatsResponseDto {
   id_property_stats!: string;
   id_property!: string;
