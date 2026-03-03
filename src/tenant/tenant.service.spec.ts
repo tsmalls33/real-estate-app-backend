@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 describe('TenantService', () => {
   let service: TenantService;
+  let mockPrisma: any;
 
   beforeEach(async () => {
     mockPrisma = {

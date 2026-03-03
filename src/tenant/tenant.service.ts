@@ -18,7 +18,7 @@ export class TenantService {
     private readonly themeService: ThemeService,
   ) { }
 
-  async createTenant(createTenantDto: CreateTenantDto): Promise<TenantResponseDto> {
+  async create(createTenantDto: CreateTenantDto): Promise<TenantResponseDto> {
     const isTenantExists = await this.tenantRepository.existsByName(createTenantDto.name);
 
     if (isTenantExists) throw new ConflictException('Tenant already exists'); // returns 409 Conflict
