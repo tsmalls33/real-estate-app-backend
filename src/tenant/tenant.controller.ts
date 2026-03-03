@@ -32,7 +32,7 @@ export class TenantController {
   @Post()
   @ResponseMessage('Tenant created successfully')
   create(@Body() createTenantDto: CreateTenantDto): Promise<TenantResponseDto> {
-    return this.tenantService.createTenant(createTenantDto);
+    return this.tenantService.create(createTenantDto);
   }
 
   @Get()
