@@ -12,7 +12,7 @@ export class CreatePropertyStatsDto {
   propertyType!: PropertyType;
   sizeSquareMeters?: number;
   yearBuilt?: number;
-  floorNumber?: number;
+  floorNumber?: string;
   hasElevator?: boolean;
   hasGarage?: boolean;
 }
@@ -23,7 +23,7 @@ export class UpdatePropertyStatsDto {
   propertyType?: PropertyType;
   sizeSquareMeters?: number;
   yearBuilt?: number;
-  floorNumber?: number;
+  floorNumber?: string;
   hasElevator?: boolean;
   hasGarage?: boolean;
 }
@@ -36,7 +36,7 @@ export class PropertyStatsResponseDto {
   propertyType!: PropertyType;
   sizeSquareMeters?: number;
   yearBuilt?: number;
-  floorNumber?: number | null;
+  floorNumber?: string;
   hasElevator?: boolean;
   hasGarage?: boolean;
   createdAt!: Date;

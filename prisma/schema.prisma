@@ -115,7 +115,7 @@ model PropertyStats {
   sizeSquareMeters  Decimal?      @db.Decimal(10, 2)
   propertyType      PropertyType
   yearBuilt         Int?
-  floorNumber       Int?
+  floorNumber       String?
   hasElevator       Boolean?
   hasGarage         Boolean?
   isDeleted         Boolean      @default(false)

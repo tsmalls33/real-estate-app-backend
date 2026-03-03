@@ -34,7 +34,7 @@ export class CreatePropertyStatsDto implements SharedCreatePropertyStatsDto {
   @IsOptional()
   @IsNumber()
   @Type(() => Number)
-  floorNumber?: number;
+  floorNumber?: string;
 
   @ApiProperty({ example: true })
   @IsBoolean()
