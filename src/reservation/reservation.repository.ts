@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { Prisma, ReservationStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { RESERVATION_SELECT } from './projections/reservation.projection';
+import { UpdateReservationDto } from './dto/update-reservation.dto';
 
 @Injectable()
 export class ReservationRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(data: Prisma.ReservationUncheckedCreateInput) {
     return this.prisma.reservation.create({ data, select: RESERVATION_SELECT });
@@ -26,7 +27,7 @@ export class ReservationRepository {
     return r !== null;
   }
 
-  async update(id_reservation: string, data: Prisma.ReservationUncheckedUpdateInput) {
+  async update(id_reservation: string, data: UpdateReservationDto) {
     return this.prisma.reservation.update({
       where: { id_reservation },
       data,

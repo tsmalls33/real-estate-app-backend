@@ -17,7 +17,7 @@ const VALID_TRANSITIONS: Partial<Record<ReservationStatus, ForwardReservationSta
 
 @Injectable()
 export class ReservationService {
-  constructor(private readonly reservationRepository: ReservationRepository) {}
+  constructor(private readonly reservationRepository: ReservationRepository) { }
 
   async create(id_property: string, dto: CreateReservationDto) {
     const propertyExists = await this.reservationRepository.propertyExists(id_property);
@@ -88,14 +88,7 @@ export class ReservationService {
         );
     }
 
-    return this.reservationRepository.update(id_reservation, {
-      ...(dto.guestName !== undefined && { guestName: dto.guestName }),
-      ...(dto.numberOfGuests !== undefined && { numberOfGuests: dto.numberOfGuests }),
-      ...(dto.startDate !== undefined && { startDate }),
-      ...(dto.endDate !== undefined && { endDate }),
-      ...(dto.totalCost !== undefined && { totalCost: dto.totalCost }),
-      ...(dto.platform !== undefined && { platform: dto.platform }),
-    });
+    return this.reservationRepository.update(id_reservation, dto);
   }
 
   async updateStatus(id_reservation: string, newStatus: ForwardReservationStatus) {
@@ -107,7 +100,7 @@ export class ReservationService {
     if (allowedNext !== newStatus)
       throw new BadRequestException(
         `Cannot transition from '${existing.status}' to '${newStatus}'. ` +
-          `Allowed: ${allowedNext ? `'${existing.status}' → '${allowedNext}'` : 'none'}`,
+        `Allowed: ${allowedNext ? `'${existing.status}' → '${allowedNext}'` : 'none'}`,
       );
 
     return this.reservationRepository.updateStatus(
