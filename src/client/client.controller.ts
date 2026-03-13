@@ -7,7 +7,6 @@ import {
   Body,
   Param,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -15,6 +14,9 @@ import { UserRoles } from '@RealEstate/types';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import { resolveTenantId } from '../common/utils/resolve-tenant';
 import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
@@ -28,8 +30,8 @@ export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
   @Get()
-  findAll(@Query() query: GetClientsQueryParams, @Req() req: any) {
-    return this.clientService.findAll(query, req.user?.tenantId);
+  findAll(@Query() query: GetClientsQueryParams, @CurrentUser() user: JwtPayload) {
+    return this.clientService.findAll(query, resolveTenantId(user));
   }
 
   @Get(':id')

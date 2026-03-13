@@ -7,7 +7,6 @@ import {
   Body,
   Param,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -15,6 +14,9 @@ import { UserRoles } from '@RealEstate/types';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import { resolveTenantId } from '../common/utils/resolve-tenant';
 import { AgentPaymentService } from './agent-payment.service';
 import { CreateAgentPaymentDto } from './dto/create-agent-payment.dto';
 import { UpdateAgentPaymentDto } from './dto/update-agent-payment.dto';
@@ -28,8 +30,8 @@ export class AgentPaymentController {
   constructor(private readonly agentPaymentService: AgentPaymentService) {}
 
   @Get()
-  findAll(@Query() query: GetAgentPaymentsQueryParams, @Req() req: any) {
-    return this.agentPaymentService.findAll(query, req.user?.tenantId);
+  findAll(@Query() query: GetAgentPaymentsQueryParams, @CurrentUser() user: JwtPayload) {
+    return this.agentPaymentService.findAll(query, resolveTenantId(user));
   }
 
   @Get(':id')
