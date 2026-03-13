@@ -163,6 +163,7 @@ model Cost {
   property    Property?    @relation(fields: [id_property], references: [id_property])
   reservation Reservation? @relation(fields: [id_reservation], references: [id_reservation])
 
+  isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
@@ -181,6 +182,7 @@ model AgentPayment {
   user   User    @relation(fields: [id_user], references: [id_user])
   tenant Tenant? @relation(fields: [id_tenant], references: [id_tenant])
 
+  isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 

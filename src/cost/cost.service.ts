@@ -109,6 +109,6 @@ export class CostService {
   async remove(id_cost: string) {
     const exists = await this.costRepository.existsById(id_cost);
     if (!exists) throw new NotFoundException(`Cost '${id_cost}' not found`);
-    return this.costRepository.delete(id_cost);
+    return this.costRepository.softDelete(id_cost);
   }
 }
