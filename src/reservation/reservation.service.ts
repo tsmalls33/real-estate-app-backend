@@ -47,7 +47,7 @@ export class ReservationService {
       startDate,
       endDate,
       totalCost: dto.totalCost,
-      platform: dto.platform as any,
+      platform: dto.platform
     });
   }
 
