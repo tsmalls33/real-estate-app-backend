@@ -16,15 +16,17 @@ export class CostRepository {
     costType?: CostType;
     id_property?: string;
     id_reservation?: string;
+    tenantId?: string;
     page: number;
     limit: number;
   }) {
-    const { costType, id_property, id_reservation, page, limit } = params;
+    const { costType, id_property, id_reservation, tenantId, page, limit } = params;
 
     const where: Prisma.CostWhereInput = {
       ...(costType && { costType: costType as any }),
       ...(id_property && { id_property }),
       ...(id_reservation && { id_reservation }),
+      ...(tenantId && { property: { id_tenant: tenantId } }),
     };
 
     const [data, total] = await this.prisma.$transaction([
@@ -76,5 +78,13 @@ export class CostRepository {
       select: { id_property: true },
     });
     return res?.id_property ?? null;
+  }
+
+  async findPropertyTenant(id_property: string): Promise<string | null> {
+    const property = await this.prisma.property.findUnique({
+      where: { id_property },
+      select: { id_tenant: true },
+    });
+    return property?.id_tenant ?? null;
   }
 }

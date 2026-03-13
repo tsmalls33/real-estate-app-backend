@@ -8,6 +8,7 @@ import { CostType } from '@RealEstate/types';
 import { CostRepository } from './cost.repository';
 import { GetCostsQueryParams } from './dto/get-costs-query-params';
 import { UpdateCostDto } from './dto/update-cost.dto';
+import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 interface CreateCostData {
   costType: CostType;
@@ -21,7 +22,7 @@ interface CreateCostData {
 export class CostService {
   constructor(private readonly costRepository: CostRepository) {}
 
-  async create(data: CreateCostData) {
+  async create(data: CreateCostData, user?: JwtPayload) {
     let { id_property, id_reservation } = data;
 
     if (id_reservation) {
@@ -43,6 +44,10 @@ export class CostService {
       id_property = reservationProperty;
     }
 
+    if (user && id_property) {
+      await this.verifyPropertyTenant(id_property, user);
+    }
+
     return this.costRepository.create({
       costType: data.costType,
       date: new Date(data.date),
@@ -52,11 +57,12 @@ export class CostService {
     } as Prisma.CostUncheckedCreateInput);
   }
 
-  async findAll(query: GetCostsQueryParams) {
+  async findAll(query: GetCostsQueryParams, tenantId?: string) {
     return this.costRepository.findAll({
       costType: query.costType,
       id_property: query.id_property,
       id_reservation: query.id_reservation,
+      tenantId,
       page: query.page ?? 1,
       limit: query.limit ?? 20,
     });
@@ -68,9 +74,13 @@ export class CostService {
     return cost;
   }
 
-  async update(id_cost: string, dto: UpdateCostDto) {
+  async update(id_cost: string, dto: UpdateCostDto, user?: JwtPayload) {
     const existing = await this.costRepository.existsById(id_cost);
     if (!existing) throw new NotFoundException(`Cost '${id_cost}' not found`);
+
+    if (user && existing.id_property) {
+      await this.verifyPropertyTenant(existing.id_property, user);
+    }
 
     const effectiveProperty = dto.id_property ?? existing.id_property;
     const effectiveReservation = dto.id_reservation ?? existing.id_reservation;
@@ -106,9 +116,23 @@ export class CostService {
     return this.costRepository.update(id_cost, updateData);
   }
 
-  async remove(id_cost: string) {
-    const exists = await this.costRepository.existsById(id_cost);
-    if (!exists) throw new NotFoundException(`Cost '${id_cost}' not found`);
+  async remove(id_cost: string, user?: JwtPayload) {
+    const existing = await this.costRepository.existsById(id_cost);
+    if (!existing) throw new NotFoundException(`Cost '${id_cost}' not found`);
+
+    if (user && existing.id_property) {
+      await this.verifyPropertyTenant(existing.id_property, user);
+    }
+
     return this.costRepository.delete(id_cost);
+  }
+
+  private async verifyPropertyTenant(id_property: string, user: JwtPayload) {
+    if (user.role === 'SUPERADMIN') return;
+
+    const propertyTenant = await this.costRepository.findPropertyTenant(id_property);
+    if (propertyTenant !== user.tenantId) {
+      throw new NotFoundException(`Cost not found`);
+    }
   }
 }

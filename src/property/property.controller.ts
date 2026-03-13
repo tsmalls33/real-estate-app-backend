@@ -94,58 +94,74 @@ export class PropertyController {
   /** POST /properties/:id_property/reservations */
   @Post(':id_property/reservations')
   @ResponseMessage('Reservation created successfully')
-  createReservation(
+  async createReservation(
     @Param('id_property') id_property: string,
     @Body() dto: CreateReservationDto,
+    @CurrentUser() user: JwtPayload,
   ) {
+    await this.propertyService.verifyTenantAccess(id_property, user);
     return this.reservationService.create(id_property, dto);
   }
-  
+
   /** PUT /properties/:id_property/stats */
   @Put(':id_property/stats')
   @ResponseMessage('Property stats saved successfully')
-  upsertStats(
+  async upsertStats(
     @Param('id_property') id_property: string,
     @Body() dto: CreatePropertyStatsDto,
+    @CurrentUser() user: JwtPayload,
   ) {
+    await this.propertyService.verifyTenantAccess(id_property, user);
     return this.propertyStatsService.upsert(id_property, dto);
   }
 
   /** GET /properties/:id_property/reservations */
   @Get(':id_property/reservations')
   @ResponseMessage('Reservations fetched successfully')
-  findReservations(
+  async findReservations(
     @Param('id_property') id_property: string,
     @Query(new ValidationPipe({ transform: true }))
     query: GetReservationsQueryParams,
+    @CurrentUser() user: JwtPayload,
   ) {
+    await this.propertyService.verifyTenantAccess(id_property, user);
     return this.propertyService.findReservations(id_property, query);
   }
 
   /** GET /properties/:id_property/costs */
   @Get(':id_property/costs')
   @ResponseMessage('Costs fetched successfully')
-  findCosts(
+  async findCosts(
     @Param('id_property') id_property: string,
     @Query(new ValidationPipe({ transform: true })) query: GetCostsQueryParams,
+    @CurrentUser() user: JwtPayload,
   ) {
+    await this.propertyService.verifyTenantAccess(id_property, user);
     return this.costService.findAll({ ...query, id_property });
   }
 
   /** POST /properties/:id_property/costs */
   @Post(':id_property/costs')
   @ResponseMessage('Cost created successfully')
-  createCost(
+  async createCost(
     @Param('id_property') id_property: string,
     @Body() dto: CreatePropertyCostDto,
+    @CurrentUser() user: JwtPayload,
   ) {
+    await this.propertyService.verifyTenantAccess(id_property, user);
     return this.costService.create({ ...dto, id_property });
   }
 
   /** PATCH /properties/:id_property/costs/:id_cost */
   @Patch(':id_property/costs/:id_cost')
   @ResponseMessage('Cost updated successfully')
-  updateCost(@Param('id_cost') id_cost: string, @Body() dto: UpdateCostDto) {
+  async updateCost(
+    @Param('id_property') id_property: string,
+    @Param('id_cost') id_cost: string,
+    @Body() dto: UpdateCostDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    await this.propertyService.verifyTenantAccess(id_property, user);
     return this.costService.update(id_cost, dto);
   }
 
@@ -153,7 +169,12 @@ export class PropertyController {
   @Delete(':id_property/costs/:id_cost')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Cost deleted successfully')
-  deleteCost(@Param('id_cost') id_cost: string) {
+  async deleteCost(
+    @Param('id_property') id_property: string,
+    @Param('id_cost') id_cost: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    await this.propertyService.verifyTenantAccess(id_property, user);
     return this.costService.remove(id_cost);
   }
 }

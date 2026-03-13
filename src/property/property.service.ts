@@ -4,6 +4,7 @@ import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { GetPropertiesQueryParams } from './dto/get-properties-query-params';
 import { GetReservationsQueryParams } from './dto/get-reservations-query-params';
+import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 import { PropertyRepository } from './property.repository';
 
@@ -76,5 +77,24 @@ export class PropertyService {
       page: query.page ?? 1,
       limit: query.limit ?? 20,
     });
+  }
+
+  /**
+   * Verify that a property belongs to the user's tenant.
+   * Throws NotFoundException if not found or tenant mismatch (avoids leaking existence).
+   * SUPERADMIN bypasses the check.
+   */
+  async verifyTenantAccess(id_property: string, user: JwtPayload) {
+    const property = await this.propertyRepository.findById(id_property);
+    if (!property)
+      throw new NotFoundException(
+        `Property with id '${id_property}' not found`,
+      );
+
+    if (user.role !== 'SUPERADMIN' && property.id_tenant !== user.tenantId) {
+      throw new NotFoundException(
+        `Property with id '${id_property}' not found`,
+      );
+    }
   }
 }

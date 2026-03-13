@@ -15,7 +15,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetUsersQueryParams } from './dto/get-users-query-params';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
+import { resolveTenantId } from '../common/utils/resolve-tenant';
+import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import { UserRoles } from '@RealEstate/types';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -38,8 +41,8 @@ export class UserController {
   @ResponseMessage('Users fetched successfully')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRoles.ADMIN, UserRoles.SUPERADMIN)
-  findAll(@Query() query: GetUsersQueryParams) {
-    return this.userService.findAll(query.page, query.limit);
+  findAll(@Query() query: GetUsersQueryParams, @CurrentUser() user: JwtPayload) {
+    return this.userService.findAll(query.page, query.limit, resolveTenantId(user));
   }
 
   /** GET /user/me — must come before GET /user/:id_user */

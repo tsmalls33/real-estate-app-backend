@@ -124,9 +124,13 @@ export class UserRepository {
   async findWithPagination(
     page: number = 1,
     limit: number = 10,
+    id_tenant?: string,
   ): Promise<{ users: User[]; total: number; page: number; limit: number }> {
     const skip = (page - 1) * limit;
-    const where = { isDeleted: false };
+    const where: Prisma.UserWhereInput = {
+      isDeleted: false,
+      ...(id_tenant && { id_tenant }),
+    };
 
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({
