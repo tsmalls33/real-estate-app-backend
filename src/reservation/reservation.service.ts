@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ReservationStatus } from '@prisma/client';
+import { Prisma, ReservationStatus } from '@prisma/client';
 import { ReservationRepository } from './reservation.repository';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
@@ -88,14 +88,15 @@ export class ReservationService {
         );
     }
 
-    return this.reservationRepository.update(id_reservation, {
-      ...(dto.guestName !== undefined && { guestName: dto.guestName }),
-      ...(dto.numberOfGuests !== undefined && { numberOfGuests: dto.numberOfGuests }),
-      ...(dto.startDate !== undefined && { startDate }),
-      ...(dto.endDate !== undefined && { endDate }),
-      ...(dto.totalCost !== undefined && { totalCost: dto.totalCost }),
-      ...(dto.platform !== undefined && { platform: dto.platform }),
-    });
+    const data: Prisma.ReservationUncheckedUpdateInput = {};
+    if (dto.guestName !== undefined) data.guestName = dto.guestName;
+    if (dto.numberOfGuests !== undefined) data.numberOfGuests = dto.numberOfGuests;
+    if (dto.startDate !== undefined) data.startDate = startDate;
+    if (dto.endDate !== undefined) data.endDate = endDate;
+    if (dto.totalCost !== undefined) data.totalCost = dto.totalCost;
+    if (dto.platform !== undefined) data.platform = dto.platform as any;
+
+    return this.reservationRepository.update(id_reservation, data);
   }
 
   async updateStatus(id_reservation: string, newStatus: ForwardReservationStatus) {
