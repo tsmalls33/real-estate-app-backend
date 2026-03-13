@@ -4,6 +4,7 @@ import { ClientRepository } from './client.repository';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { GetClientsQueryParams } from './dto/get-clients-query-params';
+import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class ClientService {
@@ -24,24 +25,44 @@ export class ClientService {
     });
   }
 
-  async findOne(id_client: string) {
+  async findOne(id_client: string, user?: JwtPayload) {
     const client = await this.clientRepository.findById(id_client);
     if (!client) throw new NotFoundException(`Client '${id_client}' not found`);
+
+    if (user) this.checkTenantMatch(client.id_tenant, user, id_client);
+
     return client;
   }
 
-  async update(id_client: string, dto: UpdateClientDto) {
-    const exists = await this.clientRepository.existsById(id_client);
-    if (!exists) throw new NotFoundException(`Client '${id_client}' not found`);
+  async update(id_client: string, dto: UpdateClientDto, user?: JwtPayload) {
+    const client = await this.clientRepository.findById(id_client);
+    if (!client) throw new NotFoundException(`Client '${id_client}' not found`);
+
+    if (user) this.checkTenantMatch(client.id_tenant, user, id_client);
+
     return this.clientRepository.update(
       id_client,
       dto as Prisma.ClientUncheckedUpdateInput,
     );
   }
 
-  async remove(id_client: string) {
-    const exists = await this.clientRepository.existsById(id_client);
-    if (!exists) throw new NotFoundException(`Client '${id_client}' not found`);
+  async remove(id_client: string, user?: JwtPayload) {
+    const client = await this.clientRepository.findById(id_client);
+    if (!client) throw new NotFoundException(`Client '${id_client}' not found`);
+
+    if (user) this.checkTenantMatch(client.id_tenant, user, id_client);
+
     return this.clientRepository.softDelete(id_client);
+  }
+
+  private checkTenantMatch(
+    clientTenantId: string | null,
+    user: JwtPayload,
+    id_client: string,
+  ) {
+    if (user.role === 'SUPERADMIN') return;
+    if (clientTenantId !== user.tenantId) {
+      throw new NotFoundException(`Client '${id_client}' not found`);
+    }
   }
 }

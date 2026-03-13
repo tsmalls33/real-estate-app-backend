@@ -35,8 +35,8 @@ export class AgentPaymentController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.agentPaymentService.findOne(id);
+  findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.agentPaymentService.findOne(id, user);
   }
 
   @Post()
@@ -45,12 +45,12 @@ export class AgentPaymentController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateAgentPaymentDto) {
-    return this.agentPaymentService.update(id, dto);
+  update(@Param('id') id: string, @Body() dto: UpdateAgentPaymentDto, @CurrentUser() user: JwtPayload) {
+    return this.agentPaymentService.update(id, dto, user);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.agentPaymentService.remove(id);
+  remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.agentPaymentService.remove(id, user);
   }
 }

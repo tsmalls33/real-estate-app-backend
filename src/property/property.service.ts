@@ -29,21 +29,26 @@ export class PropertyService {
     });
   }
 
-  async findOne(id_property: string) {
+  async findOne(id_property: string, user?: JwtPayload) {
     const property = await this.propertyRepository.findById(id_property);
     if (!property)
       throw new NotFoundException(
         `Property with id '${id_property}' not found`,
       );
+
+    if (user) this.checkTenantMatch(property.id_tenant, user, id_property);
+
     return property;
   }
 
-  async update(id_property: string, dto: UpdatePropertyDto) {
-    const exists = await this.propertyRepository.existsById(id_property);
-    if (!exists)
+  async update(id_property: string, dto: UpdatePropertyDto, user?: JwtPayload) {
+    const property = await this.propertyRepository.findById(id_property);
+    if (!property)
       throw new NotFoundException(
         `Property with id '${id_property}' not found`,
       );
+
+    if (user) this.checkTenantMatch(property.id_tenant, user, id_property);
 
     return this.propertyRepository.update(
       id_property,
@@ -51,12 +56,15 @@ export class PropertyService {
     );
   }
 
-  async remove(id_property: string) {
-    const exists = await this.propertyRepository.existsById(id_property);
-    if (!exists)
+  async remove(id_property: string, user?: JwtPayload) {
+    const property = await this.propertyRepository.findById(id_property);
+    if (!property)
       throw new NotFoundException(
         `Property with id '${id_property}' not found`,
       );
+
+    if (user) this.checkTenantMatch(property.id_tenant, user, id_property);
+
     return this.propertyRepository.softDelete(id_property);
   }
 
@@ -92,6 +100,19 @@ export class PropertyService {
       );
 
     if (user.role !== 'SUPERADMIN' && property.id_tenant !== user.tenantId) {
+      throw new NotFoundException(
+        `Property with id '${id_property}' not found`,
+      );
+    }
+  }
+
+  private checkTenantMatch(
+    propertyTenantId: string | null,
+    user: JwtPayload,
+    id_property: string,
+  ) {
+    if (user.role === 'SUPERADMIN') return;
+    if (propertyTenantId !== user.tenantId) {
       throw new NotFoundException(
         `Property with id '${id_property}' not found`,
       );
