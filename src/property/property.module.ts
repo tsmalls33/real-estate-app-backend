@@ -6,9 +6,10 @@ import { PropertyService } from './property.service';
 import { PropertyStatsService } from './property-stats.service';
 import { PropertyStatsRepository } from './property-stats.repository';
 import { CostModule } from '../cost/cost.module';
+import { ReservationModule } from '../reservation/reservation.module';
 
 @Module({
-  imports: [PrismaModule, CostModule],
+  imports: [PrismaModule, CostModule, ReservationModule],
   controllers: [PropertyController],
   providers: [PropertyService, PropertyRepository, PropertyStatsService, PropertyStatsRepository],
   exports: [PropertyService],

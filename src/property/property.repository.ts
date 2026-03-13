@@ -4,6 +4,7 @@ import {
   Prisma,
   Property,
   PropertyStatus,
+  Reservation,
   ReservationStatus,
   SaleType,
 } from '@prisma/client';
@@ -94,26 +95,39 @@ export class PropertyRepository {
   async findReservations(
     id_property: string,
     filters: {
-      startDate?: string;
-      endDate?: string;
+      startDate?: Date;
+      endDate?: Date;
       status?: ReservationStatus;
       platform?: Platform;
+      page: number;
+      limit: number;
     },
-  ) {
-    return this.prisma.reservation.findMany({
-      where: {
-        id_property,
-        ...(filters.status && { status: filters.status }),
-        ...(filters.platform && { platform: filters.platform }),
-        ...((filters.startDate || filters.endDate) && {
-          startDate: {
-            ...(filters.startDate && { gte: new Date(filters.startDate) }),
-            ...(filters.endDate && { lte: new Date(filters.endDate) }),
-          },
-        }),
-      },
-      orderBy: { startDate: 'desc' },
-    });
+  ): Promise<{ data: Reservation[]; total: number }> {
+    const { page, limit, startDate, endDate, status, platform } = filters;
+
+    const where = {
+      id_property,
+      ...(status && { status }),
+      ...(platform && { platform }),
+      ...((startDate || endDate) && {
+        startDate: {
+          ...(startDate && { gte: startDate }),
+          ...(endDate && { lte: endDate }),
+        },
+      }),
+    };
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.reservation.findMany({
+        where,
+        orderBy: { startDate: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.reservation.count({ where }),
+    ]);
+
+    return { data, total };
   }
 
 }

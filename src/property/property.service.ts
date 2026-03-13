@@ -73,6 +73,8 @@ export class PropertyService {
       endDate: query.endDate,
       status: query.status,
       platform: query.platform,
+      page: query.page ?? 1,
+      limit: query.limit ?? 20,
     });
   }
 }

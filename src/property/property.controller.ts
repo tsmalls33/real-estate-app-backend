@@ -31,6 +31,8 @@ import { CostService } from '../cost/cost.service';
 import { CreatePropertyCostDto } from '../cost/dto/create-property-cost.dto';
 import { UpdateCostDto } from '../cost/dto/update-cost.dto';
 import { GetCostsQueryParams } from '../cost/dto/get-costs-query-params';
+import { ReservationService } from '../reservation/reservation.service';
+import { CreateReservationDto } from '../reservation/dto/create-reservation.dto';
 
 @UseGuards(AuthGuard, RolesGuard)
 @Roles(UserRoles.SUPERADMIN)
@@ -39,6 +41,7 @@ import { GetCostsQueryParams } from '../cost/dto/get-costs-query-params';
 export class PropertyController {
   constructor(
     private readonly propertyService: PropertyService,
+    private readonly reservationService: ReservationService,
     private readonly propertyStatsService: PropertyStatsService,
     private readonly costService: CostService,
   ) {}
@@ -86,6 +89,16 @@ export class PropertyController {
     return this.propertyService.remove(id_property);
   }
 
+  /** POST /properties/:id_property/reservations */
+  @Post(':id_property/reservations')
+  @ResponseMessage('Reservation created successfully')
+  createReservation(
+    @Param('id_property') id_property: string,
+    @Body() dto: CreateReservationDto,
+  ) {
+    return this.reservationService.create(id_property, dto);
+  }
+  
   /** PUT /properties/:id_property/stats */
   @Put(':id_property/stats')
   @ResponseMessage('Property stats saved successfully')
