@@ -22,6 +22,7 @@ export class CostRepository {
     const { costType, id_property, id_reservation, page, limit } = params;
 
     const where: Prisma.CostWhereInput = {
+      isDeleted: false,
       ...(costType && { costType: costType as any }),
       ...(id_property && { id_property }),
       ...(id_reservation && { id_reservation }),
@@ -42,17 +43,18 @@ export class CostRepository {
   }
 
   async findById(id_cost: string) {
-    return this.prisma.cost.findUnique({
-      where: { id_cost },
+    return this.prisma.cost.findFirst({
+      where: { id_cost, isDeleted: false },
       select: COST_SELECT,
     });
   }
 
-  async existsById(id_cost: string) {
-    return this.prisma.cost.findUnique({
-      where: { id_cost },
-      select: { id_cost: true, id_property: true, id_reservation: true },
+  async existsById(id_cost: string): Promise<boolean> {
+    const cost = await this.prisma.cost.findFirst({
+      where: { id_cost, isDeleted: false },
+      select: { id_cost: true },
     });
+    return cost !== null;
   }
 
   async update(id_cost: string, data: Prisma.CostUncheckedUpdateInput) {
@@ -63,9 +65,10 @@ export class CostRepository {
     });
   }
 
-  async delete(id_cost: string) {
-    return this.prisma.cost.delete({
+  async softDelete(id_cost: string) {
+    return this.prisma.cost.update({
       where: { id_cost },
+      data: { isDeleted: true },
       select: COST_SELECT,
     });
   }

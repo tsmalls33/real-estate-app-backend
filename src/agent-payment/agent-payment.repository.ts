@@ -27,6 +27,7 @@ export class AgentPaymentRepository {
       params;
 
     const where: Prisma.AgentPaymentWhereInput = {
+      isDeleted: false,
       ...(isPaid !== undefined && { isPaid }),
       ...(id_user && { id_user }),
       ...(id_tenant && { id_tenant }),
@@ -53,15 +54,15 @@ export class AgentPaymentRepository {
   }
 
   async findById(id_agent_payment: string) {
-    return this.prisma.agentPayment.findUnique({
-      where: { id_agent_payment },
+    return this.prisma.agentPayment.findFirst({
+      where: { id_agent_payment, isDeleted: false },
       select: AGENT_PAYMENT_SELECT,
     });
   }
 
   async existsById(id_agent_payment: string): Promise<boolean> {
-    const record = await this.prisma.agentPayment.findUnique({
-      where: { id_agent_payment },
+    const record = await this.prisma.agentPayment.findFirst({
+      where: { id_agent_payment, isDeleted: false },
       select: { id_agent_payment: true },
     });
     return record !== null;
@@ -78,9 +79,10 @@ export class AgentPaymentRepository {
     });
   }
 
-  async delete(id_agent_payment: string) {
-    return this.prisma.agentPayment.delete({
+  async softDelete(id_agent_payment: string) {
+    return this.prisma.agentPayment.update({
       where: { id_agent_payment },
+      data: { isDeleted: true },
       select: AGENT_PAYMENT_SELECT,
     });
   }

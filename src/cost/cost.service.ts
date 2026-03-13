@@ -69,7 +69,7 @@ export class CostService {
   }
 
   async update(id_cost: string, dto: UpdateCostDto) {
-    const existing = await this.costRepository.existsById(id_cost);
+    const existing = await this.costRepository.findById(id_cost);
     if (!existing) throw new NotFoundException(`Cost '${id_cost}' not found`);
 
     const effectiveProperty = dto.id_property ?? existing.id_property;
@@ -109,6 +109,6 @@ export class CostService {
   async remove(id_cost: string) {
     const exists = await this.costRepository.existsById(id_cost);
     if (!exists) throw new NotFoundException(`Cost '${id_cost}' not found`);
-    return this.costRepository.delete(id_cost);
+    return this.costRepository.softDelete(id_cost);
   }
 }

@@ -59,6 +59,6 @@ export class AgentPaymentService {
       throw new NotFoundException(
         `AgentPayment '${id_agent_payment}' not found`,
       );
-    return this.agentPaymentRepository.delete(id_agent_payment);
+    return this.agentPaymentRepository.softDelete(id_agent_payment);
   }
 }
