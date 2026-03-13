@@ -13,6 +13,8 @@ import {
   Platform,
 } from '@RealEstate/types';
 
+export { Platform };
+
 export class CreateReservationDto implements SharedCreateReservationDto {
   @ApiProperty({ example: 'John Doe' })
   @IsString()

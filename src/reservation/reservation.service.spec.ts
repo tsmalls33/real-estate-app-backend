@@ -1,6 +1,7 @@
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReservationStatus } from '@prisma/client';
+import { CreateReservationDto, Platform } from './dto/create-reservation.dto';
 import { ForwardReservationStatus } from './dto/update-reservation-status.dto';
 import { ReservationRepository } from './reservation.repository';
 import { ReservationService } from './reservation.service';
@@ -16,7 +17,7 @@ const baseReservation = {
   startDate: new Date('2026-03-10'),
   endDate: new Date('2026-03-15'),
   totalCost: 500,
-  platform: 'AIRBNB',
+  platform: Platform.AIRBNB,
   status: ReservationStatus.UPCOMING,
   dateCancelled: null,
 };
@@ -52,13 +53,13 @@ describe('ReservationService', () => {
   // create
   // ---------------------------------------------------------------------------
   describe('create', () => {
-    const dto = {
+    const dto: CreateReservationDto = {
       guestName: 'Alice',
       numberOfGuests: 2,
       startDate: '2026-03-10',
       endDate: '2026-03-15',
       totalCost: 500,
-      platform: 'AIRBNB' as any,
+      platform: Platform.AIRBNB,
     };
 
     it('should throw NotFoundException when the property does not exist', async () => {
