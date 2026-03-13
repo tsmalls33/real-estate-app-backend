@@ -10,7 +10,6 @@ import {
   Post,
   Put,
   Query,
-  Req,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -18,7 +17,10 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
+import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import { resolveTenantId } from '../common/utils/resolve-tenant';
 import { UserRoles } from '@RealEstate/types';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
@@ -59,9 +61,9 @@ export class PropertyController {
   findAll(
     @Query(new ValidationPipe({ transform: true }))
     query: GetPropertiesQueryParams,
-    @Req() req: any,
+    @CurrentUser() user: JwtPayload,
   ) {
-    return this.propertyService.findAll(query, req.user?.tenantId);
+    return this.propertyService.findAll(query, resolveTenantId(user));
   }
 
   /** GET /properties/:id_property */
