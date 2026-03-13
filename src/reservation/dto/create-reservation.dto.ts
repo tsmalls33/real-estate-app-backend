@@ -10,11 +10,13 @@ import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateReservationDto as SharedCreateReservationDto } from '@RealEstate/types';
 
-export enum Platform {
-  BOOKING = 'BOOKING',
-  AIRBNB = 'AIRBNB',
-  OTHER = 'OTHER',
-}
+export const Platform = {
+  BOOKING: 'BOOKING',
+  AIRBNB: 'AIRBNB',
+  OTHER: 'OTHER',
+} as const;
+
+export type Platform = (typeof Platform)[keyof typeof Platform];
 
 export class CreateReservationDto implements SharedCreateReservationDto {
   @ApiProperty({ example: 'John Doe' })
