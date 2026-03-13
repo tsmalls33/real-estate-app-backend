@@ -24,8 +24,8 @@ export class ReservationService {
     if (!propertyExists)
       throw new NotFoundException(`Property with id '${id_property}' not found`);
 
-    const startDate = new Date(dto.startDate);
-    const endDate = new Date(dto.endDate);
+    const startDate = dto.startDate;
+    const endDate = dto.endDate;
 
     if (endDate <= startDate)
       throw new BadRequestException('endDate must be after startDate');
@@ -69,8 +69,8 @@ export class ReservationService {
       );
 
     // Re-check overlap if dates are being changed
-    const startDate = dto.startDate ? new Date(dto.startDate) : existing.startDate;
-    const endDate = dto.endDate ? new Date(dto.endDate) : existing.endDate;
+    const startDate = dto.startDate ?? existing.startDate;
+    const endDate = dto.endDate ?? existing.endDate;
 
     if (endDate <= startDate)
       throw new BadRequestException('endDate must be after startDate');

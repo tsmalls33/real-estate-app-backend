@@ -95,8 +95,8 @@ export class PropertyRepository {
   async findReservations(
     id_property: string,
     filters: {
-      startDate?: string;
-      endDate?: string;
+      startDate?: Date;
+      endDate?: Date;
       status?: ReservationStatus;
       platform?: Platform;
       page: number;
@@ -111,8 +111,8 @@ export class PropertyRepository {
       ...(platform && { platform }),
       ...((startDate || endDate) && {
         startDate: {
-          ...(startDate && { gte: new Date(startDate) }),
-          ...(endDate && { lte: new Date(endDate) }),
+          ...(startDate && { gte: startDate }),
+          ...(endDate && { lte: endDate }),
         },
       }),
     };

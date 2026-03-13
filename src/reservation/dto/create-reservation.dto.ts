@@ -1,5 +1,5 @@
 import {
-  IsDateString,
+  IsDate,
   IsEnum,
   IsNumber,
   IsPositive,
@@ -27,12 +27,14 @@ export class CreateReservationDto implements SharedCreateReservationDto {
   numberOfGuests!: number;
 
   @ApiProperty({ example: '2026-03-01' })
-  @IsDateString()
-  startDate!: string;
+  @IsDate()
+  @Type(() => Date)
+  startDate!: Date;
 
   @ApiProperty({ example: '2026-03-07' })
-  @IsDateString()
-  endDate!: string;
+  @IsDate()
+  @Type(() => Date)
+  endDate!: Date;
 
   @ApiProperty({ example: 850.0 })
   @IsNumber({ maxDecimalPlaces: 2 })
