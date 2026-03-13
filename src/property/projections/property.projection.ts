@@ -1,5 +1,6 @@
 export const PROPERTY_STATS_SELECT = {
   id_property_stats: true,
+  id_property: true,
   numberOfBedrooms: true,
   numberOfBathrooms: true,
   sizeSquareMeters: true,
@@ -9,7 +10,6 @@ export const PROPERTY_STATS_SELECT = {
   floorNumber: true,
   hasElevator: true,
   hasGarage: true,
-  isDeleted: true,
 } as const;
 
 export const PHOTO_SELECT = {
@@ -37,7 +37,6 @@ export const PROPERTY_LIST_SELECT = {
   id_owner: true,
   id_agent: true,
   id_tenant: true,
-  isDeleted: true,
   createdAt: true,
   updatedAt: true,
 } as const;

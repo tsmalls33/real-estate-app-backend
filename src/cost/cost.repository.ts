@@ -48,11 +48,12 @@ export class CostRepository {
     });
   }
 
-  async existsById(id_cost: string) {
-    return this.prisma.cost.findUnique({
+  async existsById(id_cost: string): Promise<boolean> {
+    const cost = await this.prisma.cost.findUnique({
       where: { id_cost },
-      select: { id_cost: true, id_property: true, id_reservation: true },
+      select: { id_cost: true },
     });
+    return cost !== null;
   }
 
   async update(id_cost: string, data: Prisma.CostUncheckedUpdateInput) {

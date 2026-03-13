@@ -7,7 +7,6 @@ export const CLIENT_SELECT = {
   notes: true,
   id_user: true,
   id_tenant: true,
-  isDeleted: true,
   createdAt: true,
   updatedAt: true,
 } as const;
