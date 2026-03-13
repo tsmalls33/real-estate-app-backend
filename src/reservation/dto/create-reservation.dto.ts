@@ -8,12 +8,13 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  CreateReservationDto as SharedCreateReservationDto,
-  Platform,
-} from '@RealEstate/types';
+import { CreateReservationDto as SharedCreateReservationDto } from '@RealEstate/types';
 
-export { Platform };
+export enum Platform {
+  BOOKING = 'BOOKING',
+  AIRBNB = 'AIRBNB',
+  OTHER = 'OTHER',
+}
 
 export class CreateReservationDto implements SharedCreateReservationDto {
   @ApiProperty({ example: 'John Doe' })
