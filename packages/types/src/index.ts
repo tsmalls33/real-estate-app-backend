@@ -5,3 +5,4 @@ export * from './Plan';
 export * from './Cost';
 export * from './AgentPayments';
 export * from './Reservation';
+export * from './PropertyStats';

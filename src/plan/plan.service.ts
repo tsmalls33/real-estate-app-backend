@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -48,7 +49,7 @@ export class PlanService {
       updatePlanDto.price === undefined &&
       !updatePlanDto.pricePeriod
     )
-      throw new ConflictException('No fields to update');
+      throw new BadRequestException('No fields to update');
 
     if (updatePlanDto.name) {
       const nameExists = await this.planRepository.existsByName(

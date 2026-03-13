@@ -1,5 +1,6 @@
 import {
   Injectable,
+  BadRequestException,
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
@@ -17,7 +18,7 @@ export class TenantService {
     private readonly themeService: ThemeService,
   ) { }
 
-  async createTenant(createTenantDto: CreateTenantDto): Promise<TenantResponseDto> {
+  async create(createTenantDto: CreateTenantDto): Promise<TenantResponseDto> {
     const isTenantExists = await this.tenantRepository.existsByName(createTenantDto.name);
 
     if (isTenantExists) throw new ConflictException('Tenant already exists'); // returns 409 Conflict
@@ -51,7 +52,7 @@ export class TenantService {
       !input.customDomain &&
       !input.id_plan
     ) {
-      throw new ConflictException('No fields to update'); // returns 409 Conflict
+      throw new BadRequestException('No fields to update');
     }
 
     // check if tenant name is being updated and if it already exists

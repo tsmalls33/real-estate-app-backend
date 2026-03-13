@@ -3,18 +3,17 @@ import {
   Get,
   Post,
   Body,
-  Put,
   Patch,
   Param,
   Query,
   Delete,
   UseGuards,
-  ValidationPipe
+  ValidationPipe,
 } from '@nestjs/common';
 import { TenantService } from './tenant.service';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
-import { ResponseMessage } from 'src/common/decorators/response-message.decorator';
+import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRoles } from "@RealEstate/types";
 import { GetTenantQueryParams } from './dto/get-tenant-query-params';
@@ -33,7 +32,7 @@ export class TenantController {
   @Post()
   @ResponseMessage('Tenant created successfully')
   create(@Body() createTenantDto: CreateTenantDto): Promise<TenantResponseDto> {
-    return this.tenantService.createTenant(createTenantDto);
+    return this.tenantService.create(createTenantDto);
   }
 
   @Get()
@@ -52,7 +51,7 @@ export class TenantController {
     return this.tenantService.findOne(id_tenant, includeUsers);
   }
 
-  @Put(':id_tenant')
+  @Patch(':id_tenant')
   @ResponseMessage('Tenant updated successfully')
   update(@Param('id_tenant') id_tenant: string, @Body() updateTenantDto: UpdateTenantDto): Promise<TenantResponseDto> {
     return this.tenantService.update(id_tenant, updateTenantDto);
