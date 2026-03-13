@@ -18,10 +18,8 @@ export type Platform = (typeof Platform)[keyof typeof Platform];
 export class CreateReservationDto {
   guestName!: string;
   numberOfGuests!: number;
-  /** ISO 8601 date string */
-  startDate!: string;
-  /** ISO 8601 date string */
-  endDate!: string;
+  startDate!: Date;
+  endDate!: Date;
   totalCost!: number;
   platform!: Platform;
 }
@@ -29,10 +27,8 @@ export class CreateReservationDto {
 export class UpdateReservationDto {
   guestName?: string;
   numberOfGuests?: number;
-  /** ISO 8601 date string */
-  startDate?: string;
-  /** ISO 8601 date string */
-  endDate?: string;
+  startDate?: Date;
+  endDate?: Date;
   totalCost?: number;
   platform?: Platform;
 }

@@ -1,18 +1,20 @@
-import { IsDateString, IsEnum, IsInt, IsOptional, Min } from 'class-validator';
+import { IsDate, IsEnum, IsInt, IsOptional, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Platform, ReservationStatus } from '@prisma/client';
 
 export class GetReservationsQueryParams {
   @ApiPropertyOptional({ example: '2026-01-01' })
-  @IsDateString()
+  @IsDate()
+  @Type(() => Date)
   @IsOptional()
-  startDate?: string;
+  startDate?: Date;
 
   @ApiPropertyOptional({ example: '2026-12-31' })
-  @IsDateString()
+  @IsDate()
+  @Type(() => Date)
   @IsOptional()
-  endDate?: string;
+  endDate?: Date;
 
   @ApiPropertyOptional({ enum: ReservationStatus })
   @IsEnum(ReservationStatus)

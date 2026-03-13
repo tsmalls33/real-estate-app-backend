@@ -56,8 +56,8 @@ describe('ReservationService', () => {
     const dto: CreateReservationDto = {
       guestName: 'Alice',
       numberOfGuests: 2,
-      startDate: '2026-03-10',
-      endDate: '2026-03-15',
+      startDate: new Date('2026-03-10'),
+      endDate: new Date('2026-03-15'),
       totalCost: 500,
       platform: Platform.AIRBNB,
     };
@@ -72,7 +72,7 @@ describe('ReservationService', () => {
       mockRepo.propertyExists.mockResolvedValue(true);
 
       await expect(
-        service.create(PROPERTY_ID, { ...dto, startDate: '2026-03-10', endDate: '2026-03-10' }),
+        service.create(PROPERTY_ID, { ...dto, startDate: new Date('2026-03-10'), endDate: new Date('2026-03-10') }),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -80,7 +80,7 @@ describe('ReservationService', () => {
       mockRepo.propertyExists.mockResolvedValue(true);
 
       await expect(
-        service.create(PROPERTY_ID, { ...dto, startDate: '2026-03-15', endDate: '2026-03-10' }),
+        service.create(PROPERTY_ID, { ...dto, startDate: new Date('2026-03-15'), endDate: new Date('2026-03-10') }),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -100,7 +100,7 @@ describe('ReservationService', () => {
 
       // endDate of existing == startDate of new → should succeed
       await expect(
-        service.create(PROPERTY_ID, { ...dto, startDate: '2026-03-15', endDate: '2026-03-20' }),
+        service.create(PROPERTY_ID, { ...dto, startDate: new Date('2026-03-15'), endDate: new Date('2026-03-20') }),
       ).resolves.not.toThrow();
     });
 
@@ -173,7 +173,7 @@ describe('ReservationService', () => {
       mockRepo.findById.mockResolvedValue(baseReservation);
 
       await expect(
-        service.update(RESERVATION_ID, { startDate: '2026-04-01', endDate: '2026-04-01' }),
+        service.update(RESERVATION_ID, { startDate: new Date('2026-04-01'), endDate: new Date('2026-04-01') }),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -181,7 +181,7 @@ describe('ReservationService', () => {
       mockRepo.findById.mockResolvedValue(baseReservation);
 
       await expect(
-        service.update(RESERVATION_ID, { startDate: '2026-04-05', endDate: '2026-04-01' }),
+        service.update(RESERVATION_ID, { startDate: new Date('2026-04-05'), endDate: new Date('2026-04-01') }),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -190,7 +190,7 @@ describe('ReservationService', () => {
       mockRepo.checkOverlap.mockResolvedValue(true);
 
       await expect(
-        service.update(RESERVATION_ID, { startDate: '2026-04-01', endDate: '2026-04-10' }),
+        service.update(RESERVATION_ID, { startDate: new Date('2026-04-01'), endDate: new Date('2026-04-10') }),
       ).rejects.toThrow(ConflictException);
     });
 
@@ -201,7 +201,7 @@ describe('ReservationService', () => {
       mockRepo.update.mockResolvedValue(updated);
 
       await expect(
-        service.update(RESERVATION_ID, { startDate: '2026-03-15', endDate: '2026-03-20' }),
+        service.update(RESERVATION_ID, { startDate: new Date('2026-03-15'), endDate: new Date('2026-03-20') }),
       ).resolves.not.toThrow();
     });
 
