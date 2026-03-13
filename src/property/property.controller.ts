@@ -69,8 +69,11 @@ export class PropertyController {
   /** GET /properties/:id_property */
   @Get(':id_property')
   @ResponseMessage('Property fetched successfully')
-  findOne(@Param('id_property') id_property: string) {
-    return this.propertyService.findOne(id_property);
+  findOne(
+    @Param('id_property') id_property: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.propertyService.findOne(id_property, user);
   }
 
   /** PATCH /properties/:id_property */
@@ -79,16 +82,20 @@ export class PropertyController {
   update(
     @Param('id_property') id_property: string,
     @Body() updatePropertyDto: UpdatePropertyDto,
+    @CurrentUser() user: JwtPayload,
   ) {
-    return this.propertyService.update(id_property, updatePropertyDto);
+    return this.propertyService.update(id_property, updatePropertyDto, user);
   }
 
   /** DELETE /properties/:id_property */
   @Delete(':id_property')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Property deleted successfully')
-  remove(@Param('id_property') id_property: string) {
-    return this.propertyService.remove(id_property);
+  remove(
+    @Param('id_property') id_property: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.propertyService.remove(id_property, user);
   }
 
   /** POST /properties/:id_property/reservations */

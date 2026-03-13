@@ -4,6 +4,7 @@ import { AgentPaymentRepository } from './agent-payment.repository';
 import { CreateAgentPaymentDto } from './dto/create-agent-payment.dto';
 import { UpdateAgentPaymentDto } from './dto/update-agent-payment.dto';
 import { GetAgentPaymentsQueryParams } from './dto/get-agent-payments-query-params';
+import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AgentPaymentService {
@@ -29,36 +30,58 @@ export class AgentPaymentService {
     });
   }
 
-  async findOne(id_agent_payment: string) {
+  async findOne(id_agent_payment: string, user?: JwtPayload) {
     const payment =
       await this.agentPaymentRepository.findById(id_agent_payment);
     if (!payment)
       throw new NotFoundException(
         `AgentPayment '${id_agent_payment}' not found`,
       );
+
+    if (user) this.checkTenantMatch(payment.id_tenant, user, id_agent_payment);
+
     return payment;
   }
 
-  async update(id_agent_payment: string, dto: UpdateAgentPaymentDto) {
-    const exists =
-      await this.agentPaymentRepository.existsById(id_agent_payment);
-    if (!exists)
+  async update(id_agent_payment: string, dto: UpdateAgentPaymentDto, user?: JwtPayload) {
+    const payment =
+      await this.agentPaymentRepository.findById(id_agent_payment);
+    if (!payment)
       throw new NotFoundException(
         `AgentPayment '${id_agent_payment}' not found`,
       );
+
+    if (user) this.checkTenantMatch(payment.id_tenant, user, id_agent_payment);
+
     return this.agentPaymentRepository.update(
       id_agent_payment,
       dto as Prisma.AgentPaymentUncheckedUpdateInput,
     );
   }
 
-  async remove(id_agent_payment: string) {
-    const exists =
-      await this.agentPaymentRepository.existsById(id_agent_payment);
-    if (!exists)
+  async remove(id_agent_payment: string, user?: JwtPayload) {
+    const payment =
+      await this.agentPaymentRepository.findById(id_agent_payment);
+    if (!payment)
       throw new NotFoundException(
         `AgentPayment '${id_agent_payment}' not found`,
       );
+
+    if (user) this.checkTenantMatch(payment.id_tenant, user, id_agent_payment);
+
     return this.agentPaymentRepository.softDelete(id_agent_payment);
+  }
+
+  private checkTenantMatch(
+    paymentTenantId: string | null,
+    user: JwtPayload,
+    id_agent_payment: string,
+  ) {
+    if (user.role === 'SUPERADMIN') return;
+    if (paymentTenantId !== user.tenantId) {
+      throw new NotFoundException(
+        `AgentPayment '${id_agent_payment}' not found`,
+      );
+    }
   }
 }
