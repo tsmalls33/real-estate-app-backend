@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ReservationStatus } from '@prisma/client';
+import { Platform, ReservationStatus } from '@prisma/client';
 import { ReservationRepository } from './reservation.repository';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
@@ -47,7 +47,7 @@ export class ReservationService {
       startDate,
       endDate,
       totalCost: dto.totalCost,
-      platform: dto.platform as any,
+      platform: dto.platform as Platform,
     });
   }
 
