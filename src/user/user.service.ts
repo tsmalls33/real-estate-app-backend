@@ -62,8 +62,8 @@ export class UserService {
     return user;
   }
 
-  async findAll(page = 1, limit = 20) {
-    return this.userRepository.findWithPagination(page, limit);
+  async findAll(page = 1, limit = 20, tenantId?: string) {
+    return this.userRepository.findWithPagination(page, limit, tenantId);
   }
 
   async findOne(id_user: string): Promise<UserResponseDto> {
