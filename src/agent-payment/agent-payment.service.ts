@@ -66,9 +66,9 @@ export class AgentPaymentService {
       throw new NotFoundException(
         `AgentPayment '${id_agent_payment}' not found`,
       );
-    
+
     if (scope) assertTenantMatch(scope, payment.id_tenant);
-    
+
     return this.agentPaymentRepository.softDelete(id_agent_payment);
   }
 }

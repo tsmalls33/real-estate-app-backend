@@ -60,7 +60,7 @@ export class CostService {
   }
 
   async update(id_cost: string, dto: UpdateCostDto, scope?: TenantScope) {
-    const existing = await this.costRepository.existsById(id_cost);
+    const existing = await this.costRepository.findById(id_cost);
     if (!existing) throw new NotFoundException(`Cost '${id_cost}' not found`);
 
     if (scope && existing.id_property) {
@@ -101,14 +101,14 @@ export class CostService {
     return this.costRepository.update(id_cost, updateData);
   }
 
-  async remove(id_cost: string) {
-    const exists = await this.costRepository.existsById(id_cost);
-    if (!exists) throw new NotFoundException(`Cost '${id_cost}' not found`);
-    
+  async remove(id_cost: string, scope?: TenantScope) {
+    const existing = await this.costRepository.findById(id_cost);
+    if (!existing) throw new NotFoundException(`Cost '${id_cost}' not found`);
+
     if (scope && existing.id_property) {
       await this.verifyPropertyTenant(existing.id_property, scope);
     }
-    
+
     return this.costRepository.softDelete(id_cost);
   }
 
