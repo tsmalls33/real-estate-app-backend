@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import type { TenantScope } from '../common/types/tenant-scope';
 import { CLIENT_SELECT } from './projections/client.projection';
 
 @Injectable()
@@ -13,15 +14,15 @@ export class ClientRepository {
 
   async findAll(params: {
     search?: string;
-    id_tenant?: string;
+    scope: TenantScope;
     page: number;
     limit: number;
   }) {
-    const { search, id_tenant, page, limit } = params;
+    const { search, scope, page, limit } = params;
 
     const where: Prisma.ClientWhereInput = {
       isDeleted: false,
-      ...(id_tenant && { id_tenant }),
+      ...(scope.type === 'TENANT' && { id_tenant: scope.tenantId }),
       ...(search && {
         OR: [
           { firstName: { contains: search, mode: 'insensitive' } },

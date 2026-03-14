@@ -4,7 +4,7 @@ import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { GetPropertiesQueryParams } from './dto/get-properties-query-params';
 import { GetReservationsQueryParams } from './dto/get-reservations-query-params';
-import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import type { TenantScope } from '../common/types/tenant-scope';
 
 import { PropertyRepository } from './property.repository';
 
@@ -18,37 +18,37 @@ export class PropertyService {
     );
   }
 
-  async findAll(query: GetPropertiesQueryParams, tenantId?: string) {
+  async findAll(query: GetPropertiesQueryParams, scope: TenantScope) {
     return this.propertyRepository.findAll({
       status: query.status,
       saleType: query.saleType,
-      id_tenant: tenantId ?? query.id_tenant,
+      scope,
       id_agent: query.id_agent,
       page: query.page ?? 1,
       limit: query.limit ?? 20,
     });
   }
 
-  async findOne(id_property: string, user?: JwtPayload) {
+  async findOne(id_property: string, scope?: TenantScope) {
     const property = await this.propertyRepository.findById(id_property);
     if (!property)
       throw new NotFoundException(
         `Property with id '${id_property}' not found`,
       );
 
-    if (user) this.checkTenantMatch(property.id_tenant, user, id_property);
+    if (scope) this.checkTenantMatch(property.id_tenant, scope, id_property);
 
     return property;
   }
 
-  async update(id_property: string, dto: UpdatePropertyDto, user?: JwtPayload) {
+  async update(id_property: string, dto: UpdatePropertyDto, scope?: TenantScope) {
     const property = await this.propertyRepository.findById(id_property);
     if (!property)
       throw new NotFoundException(
         `Property with id '${id_property}' not found`,
       );
 
-    if (user) this.checkTenantMatch(property.id_tenant, user, id_property);
+    if (scope) this.checkTenantMatch(property.id_tenant, scope, id_property);
 
     return this.propertyRepository.update(
       id_property,
@@ -56,14 +56,14 @@ export class PropertyService {
     );
   }
 
-  async remove(id_property: string, user?: JwtPayload) {
+  async remove(id_property: string, scope?: TenantScope) {
     const property = await this.propertyRepository.findById(id_property);
     if (!property)
       throw new NotFoundException(
         `Property with id '${id_property}' not found`,
       );
 
-    if (user) this.checkTenantMatch(property.id_tenant, user, id_property);
+    if (scope) this.checkTenantMatch(property.id_tenant, scope, id_property);
 
     return this.propertyRepository.softDelete(id_property);
   }
@@ -92,14 +92,14 @@ export class PropertyService {
    * Throws NotFoundException if not found or tenant mismatch (avoids leaking existence).
    * SUPERADMIN bypasses the check.
    */
-  async verifyTenantAccess(id_property: string, user: JwtPayload) {
+  async verifyTenantAccess(id_property: string, scope: TenantScope) {
     const property = await this.propertyRepository.findById(id_property);
     if (!property)
       throw new NotFoundException(
         `Property with id '${id_property}' not found`,
       );
 
-    if (user.role !== 'SUPERADMIN' && property.id_tenant !== user.tenantId) {
+    if (scope.type === 'TENANT' && property.id_tenant !== scope.tenantId) {
       throw new NotFoundException(
         `Property with id '${id_property}' not found`,
       );
@@ -108,11 +108,11 @@ export class PropertyService {
 
   private checkTenantMatch(
     propertyTenantId: string | null,
-    user: JwtPayload,
+    scope: TenantScope,
     id_property: string,
   ) {
-    if (user.role === 'SUPERADMIN') return;
-    if (propertyTenantId !== user.tenantId) {
+    if (scope.type === 'ALL') return;
+    if (propertyTenantId !== scope.tenantId) {
       throw new NotFoundException(
         `Property with id '${id_property}' not found`,
       );

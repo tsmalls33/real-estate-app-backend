@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import type { TenantScope } from '../common/types/tenant-scope';
 import { AGENT_PAYMENT_SELECT } from './projections/agent-payment.projection';
 
 @Injectable()
@@ -17,19 +18,19 @@ export class AgentPaymentRepository {
   async findAll(params: {
     isPaid?: boolean;
     id_user?: string;
-    id_tenant?: string;
+    scope: TenantScope;
     startDate?: string;
     endDate?: string;
     page: number;
     limit: number;
   }) {
-    const { isPaid, id_user, id_tenant, startDate, endDate, page, limit } =
+    const { isPaid, id_user, scope, startDate, endDate, page, limit } =
       params;
 
     const where: Prisma.AgentPaymentWhereInput = {
       ...(isPaid !== undefined && { isPaid }),
       ...(id_user && { id_user }),
-      ...(id_tenant && { id_tenant }),
+      ...(scope.type === 'TENANT' && { id_tenant: scope.tenantId }),
       ...((startDate || endDate) && {
         dueDate: {
           ...(startDate && { gte: new Date(startDate) }),

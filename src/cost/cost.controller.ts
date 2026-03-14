@@ -15,9 +15,8 @@ import { UserRoles } from '@RealEstate/types';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { resolveTenantId } from '../common/utils/resolve-tenant';
-import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
+import type { TenantScope } from '../common/types/tenant-scope';
 import { CostService } from './cost.service';
 import { CreateCostDto } from './dto/create-cost.dto';
 import { UpdateCostDto } from './dto/update-cost.dto';
@@ -33,9 +32,9 @@ export class CostController {
   @Get()
   findAll(
     @Query(new ValidationPipe({ transform: true })) query: GetCostsQueryParams,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
-    return this.costService.findAll(query, resolveTenantId(user));
+    return this.costService.findAll(query, scope);
   }
 
   @Get(':id')
@@ -44,17 +43,17 @@ export class CostController {
   }
 
   @Post()
-  create(@Body() dto: CreateCostDto, @CurrentUser() user: JwtPayload) {
-    return this.costService.create(dto, user);
+  create(@Body() dto: CreateCostDto, @CurrentTenant() scope: TenantScope) {
+    return this.costService.create(dto, scope);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateCostDto, @CurrentUser() user: JwtPayload) {
-    return this.costService.update(id, dto, user);
+  update(@Param('id') id: string, @Body() dto: UpdateCostDto, @CurrentTenant() scope: TenantScope) {
+    return this.costService.update(id, dto, scope);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    return this.costService.remove(id, user);
+  remove(@Param('id') id: string, @CurrentTenant() scope: TenantScope) {
+    return this.costService.remove(id, scope);
   }
 }

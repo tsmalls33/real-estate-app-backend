@@ -14,9 +14,8 @@ import { UserRoles } from '@RealEstate/types';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
-import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
-import { resolveTenantId } from '../common/utils/resolve-tenant';
+import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
+import type { TenantScope } from '../common/types/tenant-scope';
 import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
@@ -30,13 +29,13 @@ export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
   @Get()
-  findAll(@Query() query: GetClientsQueryParams, @CurrentUser() user: JwtPayload) {
-    return this.clientService.findAll(query, resolveTenantId(user));
+  findAll(@Query() query: GetClientsQueryParams, @CurrentTenant() scope: TenantScope) {
+    return this.clientService.findAll(query, scope);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    return this.clientService.findOne(id, user);
+  findOne(@Param('id') id: string, @CurrentTenant() scope: TenantScope) {
+    return this.clientService.findOne(id, scope);
   }
 
   @Post()
@@ -45,12 +44,12 @@ export class ClientController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateClientDto, @CurrentUser() user: JwtPayload) {
-    return this.clientService.update(id, dto, user);
+  update(@Param('id') id: string, @Body() dto: UpdateClientDto, @CurrentTenant() scope: TenantScope) {
+    return this.clientService.update(id, dto, scope);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    return this.clientService.remove(id, user);
+  remove(@Param('id') id: string, @CurrentTenant() scope: TenantScope) {
+    return this.clientService.remove(id, scope);
   }
 }

@@ -17,9 +17,9 @@ import { UserRoles } from '@RealEstate/types';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
-import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import type { TenantScope } from '../common/types/tenant-scope';
 import { CostService } from '../cost/cost.service';
 import { CreateReservationCostDto } from '../cost/dto/create-reservation-cost.dto';
 import { UpdateCostDto } from '../cost/dto/update-cost.dto';
@@ -43,9 +43,9 @@ export class ReservationController {
   @ResponseMessage('Reservation fetched successfully')
   findOne(
     @Param('id_reservation') id_reservation: string,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
-    return this.reservationService.findOne(id_reservation, user);
+    return this.reservationService.findOne(id_reservation, scope);
   }
 
   /** PATCH /reservations/:id_reservation */
@@ -54,9 +54,9 @@ export class ReservationController {
   update(
     @Param('id_reservation') id_reservation: string,
     @Body() dto: UpdateReservationDto,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
-    return this.reservationService.update(id_reservation, dto, user);
+    return this.reservationService.update(id_reservation, dto, scope);
   }
 
   /** PATCH /reservations/:id_reservation/status */
@@ -65,9 +65,9 @@ export class ReservationController {
   updateStatus(
     @Param('id_reservation') id_reservation: string,
     @Body() dto: UpdateReservationStatusDto,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
-    return this.reservationService.updateStatus(id_reservation, dto.status, user);
+    return this.reservationService.updateStatus(id_reservation, dto.status, scope);
   }
 
   /** PATCH /reservations/:id_reservation/cancel */
@@ -76,9 +76,9 @@ export class ReservationController {
   @ResponseMessage('Reservation cancelled successfully')
   cancel(
     @Param('id_reservation') id_reservation: string,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
-    return this.reservationService.cancel(id_reservation, user);
+    return this.reservationService.cancel(id_reservation, scope);
   }
 
   /** GET /reservations/:id_reservation/costs */
@@ -86,11 +86,11 @@ export class ReservationController {
   findCosts(
     @Param('id_reservation') id_reservation: string,
     @Query(new ValidationPipe({ transform: true })) query: GetCostsQueryParams,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
     // Verify reservation tenant before listing costs
-    return this.reservationService.findOne(id_reservation, user).then(() =>
-      this.costService.findAll({ ...query, id_reservation }),
+    return this.reservationService.findOne(id_reservation, scope).then(() =>
+      this.costService.findAll({ ...query, id_reservation }, scope),
     );
   }
 
@@ -99,10 +99,10 @@ export class ReservationController {
   createCost(
     @Param('id_reservation') id_reservation: string,
     @Body() dto: CreateReservationCostDto,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
     // Verify reservation tenant before creating cost
-    return this.reservationService.findOne(id_reservation, user).then(() =>
+    return this.reservationService.findOne(id_reservation, scope).then(() =>
       this.costService.create({ ...dto, id_reservation }),
     );
   }
@@ -113,10 +113,10 @@ export class ReservationController {
     @Param('id_reservation') id_reservation: string,
     @Param('id_cost') id_cost: string,
     @Body() dto: UpdateCostDto,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
     // Verify reservation tenant before updating cost
-    return this.reservationService.findOne(id_reservation, user).then(() =>
+    return this.reservationService.findOne(id_reservation, scope).then(() =>
       this.costService.update(id_cost, dto),
     );
   }
@@ -126,10 +126,10 @@ export class ReservationController {
   deleteCost(
     @Param('id_reservation') id_reservation: string,
     @Param('id_cost') id_cost: string,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
     // Verify reservation tenant before deleting cost
-    return this.reservationService.findOne(id_reservation, user).then(() =>
+    return this.reservationService.findOne(id_reservation, scope).then(() =>
       this.costService.remove(id_cost),
     );
   }

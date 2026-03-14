@@ -14,9 +14,8 @@ import { UserRoles } from '@RealEstate/types';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
-import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
-import { resolveTenantId } from '../common/utils/resolve-tenant';
+import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
+import type { TenantScope } from '../common/types/tenant-scope';
 import { AgentPaymentService } from './agent-payment.service';
 import { CreateAgentPaymentDto } from './dto/create-agent-payment.dto';
 import { UpdateAgentPaymentDto } from './dto/update-agent-payment.dto';
@@ -30,13 +29,13 @@ export class AgentPaymentController {
   constructor(private readonly agentPaymentService: AgentPaymentService) {}
 
   @Get()
-  findAll(@Query() query: GetAgentPaymentsQueryParams, @CurrentUser() user: JwtPayload) {
-    return this.agentPaymentService.findAll(query, resolveTenantId(user));
+  findAll(@Query() query: GetAgentPaymentsQueryParams, @CurrentTenant() scope: TenantScope) {
+    return this.agentPaymentService.findAll(query, scope);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    return this.agentPaymentService.findOne(id, user);
+  findOne(@Param('id') id: string, @CurrentTenant() scope: TenantScope) {
+    return this.agentPaymentService.findOne(id, scope);
   }
 
   @Post()
@@ -45,12 +44,12 @@ export class AgentPaymentController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateAgentPaymentDto, @CurrentUser() user: JwtPayload) {
-    return this.agentPaymentService.update(id, dto, user);
+  update(@Param('id') id: string, @Body() dto: UpdateAgentPaymentDto, @CurrentTenant() scope: TenantScope) {
+    return this.agentPaymentService.update(id, dto, scope);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    return this.agentPaymentService.remove(id, user);
+  remove(@Param('id') id: string, @CurrentTenant() scope: TenantScope) {
+    return this.agentPaymentService.remove(id, scope);
   }
 }
