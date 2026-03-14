@@ -9,7 +9,7 @@ import { ReservationRepository } from './reservation.repository';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { ForwardReservationStatus } from './dto/update-reservation-status.dto';
-import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import type { TenantScope } from '../common/types/tenant-scope';
 
 const VALID_TRANSITIONS: Partial<Record<ReservationStatus, ForwardReservationStatus>> = {
   [ReservationStatus.UPCOMING]: ForwardReservationStatus.ACTIVE,
@@ -52,24 +52,24 @@ export class ReservationService {
     });
   }
 
-  async findOne(id_reservation: string, user?: JwtPayload) {
+  async findOne(id_reservation: string, scope?: TenantScope) {
     const reservation = await this.reservationRepository.findByIdWithTenant(id_reservation);
     if (!reservation)
       throw new NotFoundException(`Reservation with id '${id_reservation}' not found`);
 
-    if (user) this.verifyTenant(reservation.property.id_tenant, user, id_reservation);
+    if (scope) this.verifyTenant(reservation.property.id_tenant, scope, id_reservation);
 
     // Strip internal property relation before returning
     const { property: _property, ...result } = reservation;
     return result;
   }
 
-  async update(id_reservation: string, dto: UpdateReservationDto, user?: JwtPayload) {
+  async update(id_reservation: string, dto: UpdateReservationDto, scope?: TenantScope) {
     const existing = await this.reservationRepository.findByIdWithTenant(id_reservation);
     if (!existing)
       throw new NotFoundException(`Reservation with id '${id_reservation}' not found`);
 
-    if (user) this.verifyTenant(existing.property.id_tenant, user, id_reservation);
+    if (scope) this.verifyTenant(existing.property.id_tenant, scope, id_reservation);
 
     if (existing.status === ReservationStatus.CANCELLED || existing.status === ReservationStatus.COMPLETED)
       throw new BadRequestException(
@@ -99,12 +99,12 @@ export class ReservationService {
     return this.reservationRepository.update(id_reservation, dto);
   }
 
-  async updateStatus(id_reservation: string, newStatus: ForwardReservationStatus, user?: JwtPayload) {
+  async updateStatus(id_reservation: string, newStatus: ForwardReservationStatus, scope?: TenantScope) {
     const existing = await this.reservationRepository.findByIdWithTenant(id_reservation);
     if (!existing)
       throw new NotFoundException(`Reservation with id '${id_reservation}' not found`);
 
-    if (user) this.verifyTenant(existing.property.id_tenant, user, id_reservation);
+    if (scope) this.verifyTenant(existing.property.id_tenant, scope, id_reservation);
 
     const allowedNext = VALID_TRANSITIONS[existing.status];
     if (allowedNext !== newStatus)
@@ -119,12 +119,12 @@ export class ReservationService {
     );
   }
 
-  async cancel(id_reservation: string, user?: JwtPayload) {
+  async cancel(id_reservation: string, scope?: TenantScope) {
     const existing = await this.reservationRepository.findByIdWithTenant(id_reservation);
     if (!existing)
       throw new NotFoundException(`Reservation with id '${id_reservation}' not found`);
 
-    if (user) this.verifyTenant(existing.property.id_tenant, user, id_reservation);
+    if (scope) this.verifyTenant(existing.property.id_tenant, scope, id_reservation);
 
     if (
       existing.status === ReservationStatus.CANCELLED ||
@@ -137,10 +137,9 @@ export class ReservationService {
     return this.reservationRepository.cancel(id_reservation);
   }
 
-  /** Verify the reservation's property belongs to the user's tenant. */
-  private verifyTenant(propertyTenantId: string | null, user: JwtPayload, id_reservation: string) {
-    if (user.role === 'SUPERADMIN') return;
-    if (propertyTenantId !== user.tenantId) {
+  private verifyTenant(propertyTenantId: string | null, scope: TenantScope, id_reservation: string) {
+    if (scope.type === 'ALL') return;
+    if (propertyTenantId !== scope.tenantId) {
       throw new NotFoundException(`Reservation with id '${id_reservation}' not found`);
     }
   }

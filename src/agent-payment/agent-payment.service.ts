@@ -4,7 +4,7 @@ import { AgentPaymentRepository } from './agent-payment.repository';
 import { CreateAgentPaymentDto } from './dto/create-agent-payment.dto';
 import { UpdateAgentPaymentDto } from './dto/update-agent-payment.dto';
 import { GetAgentPaymentsQueryParams } from './dto/get-agent-payments-query-params';
-import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import type { TenantScope } from '../common/types/tenant-scope';
 
 @Injectable()
 export class AgentPaymentService {
@@ -18,11 +18,11 @@ export class AgentPaymentService {
     );
   }
 
-  async findAll(query: GetAgentPaymentsQueryParams, tenantId?: string) {
+  async findAll(query: GetAgentPaymentsQueryParams, scope: TenantScope) {
     return this.agentPaymentRepository.findAll({
       isPaid: query.isPaid,
       id_user: query.id_user,
-      id_tenant: tenantId,
+      scope,
       startDate: query.startDate,
       endDate: query.endDate,
       page: query.page ?? 1,
@@ -30,7 +30,7 @@ export class AgentPaymentService {
     });
   }
 
-  async findOne(id_agent_payment: string, user?: JwtPayload) {
+  async findOne(id_agent_payment: string, scope?: TenantScope) {
     const payment =
       await this.agentPaymentRepository.findById(id_agent_payment);
     if (!payment)
@@ -38,12 +38,12 @@ export class AgentPaymentService {
         `AgentPayment '${id_agent_payment}' not found`,
       );
 
-    if (user) this.checkTenantMatch(payment.id_tenant, user, id_agent_payment);
+    if (scope) this.checkTenantMatch(payment.id_tenant, scope, id_agent_payment);
 
     return payment;
   }
 
-  async update(id_agent_payment: string, dto: UpdateAgentPaymentDto, user?: JwtPayload) {
+  async update(id_agent_payment: string, dto: UpdateAgentPaymentDto, scope?: TenantScope) {
     const payment =
       await this.agentPaymentRepository.findById(id_agent_payment);
     if (!payment)
@@ -51,7 +51,7 @@ export class AgentPaymentService {
         `AgentPayment '${id_agent_payment}' not found`,
       );
 
-    if (user) this.checkTenantMatch(payment.id_tenant, user, id_agent_payment);
+    if (scope) this.checkTenantMatch(payment.id_tenant, scope, id_agent_payment);
 
     return this.agentPaymentRepository.update(
       id_agent_payment,
@@ -59,7 +59,7 @@ export class AgentPaymentService {
     );
   }
 
-  async remove(id_agent_payment: string, user?: JwtPayload) {
+  async remove(id_agent_payment: string, scope?: TenantScope) {
     const payment =
       await this.agentPaymentRepository.findById(id_agent_payment);
     if (!payment)
@@ -67,18 +67,18 @@ export class AgentPaymentService {
         `AgentPayment '${id_agent_payment}' not found`,
       );
 
-    if (user) this.checkTenantMatch(payment.id_tenant, user, id_agent_payment);
+    if (scope) this.checkTenantMatch(payment.id_tenant, scope, id_agent_payment);
 
     return this.agentPaymentRepository.softDelete(id_agent_payment);
   }
 
   private checkTenantMatch(
     paymentTenantId: string | null,
-    user: JwtPayload,
+    scope: TenantScope,
     id_agent_payment: string,
   ) {
-    if (user.role === 'SUPERADMIN') return;
-    if (paymentTenantId !== user.tenantId) {
+    if (scope.type === 'ALL') return;
+    if (paymentTenantId !== scope.tenantId) {
       throw new NotFoundException(
         `AgentPayment '${id_agent_payment}' not found`,
       );

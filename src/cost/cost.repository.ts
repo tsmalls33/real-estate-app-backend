@@ -1,33 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { CostType } from '@RealEstate/types';
 import { PrismaService } from '../prisma/prisma.service';
+import type { TenantScope } from '../common/types/tenant-scope';
+import { GetCostsQueryParams } from './dto/get-costs-query-params';
 import { COST_SELECT } from './projections/cost.projection';
 
 @Injectable()
 export class CostRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(data: Prisma.CostUncheckedCreateInput) {
     return this.prisma.cost.create({ data, select: COST_SELECT });
   }
 
-  async findAll(params: {
-    costType?: CostType;
-    id_property?: string;
-    id_reservation?: string;
-    tenantId?: string;
-    page: number;
-    limit: number;
-  }) {
-    const { costType, id_property, id_reservation, tenantId, page, limit } = params;
+  async findAll(query: GetCostsQueryParams, scope: TenantScope) {
+    const { costType, id_property, id_reservation } = query;
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
 
     const where: Prisma.CostWhereInput = {
       isDeleted: false,
-      ...(costType && { costType: costType as any }),
+      ...(costType && { costType: costType }),
       ...(id_property && { id_property }),
       ...(id_reservation && { id_reservation }),
-      ...(tenantId && { property: { id_tenant: tenantId } }),
+      ...(scope.type === 'TENANT' && { property: { id_tenant: scope.tenantId } }),
     };
 
     const [data, total] = await this.prisma.$transaction([

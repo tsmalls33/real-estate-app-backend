@@ -17,10 +17,9 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
-import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
-import { resolveTenantId } from '../common/utils/resolve-tenant';
+import type { TenantScope } from '../common/types/tenant-scope';
 import { UserRoles } from '@RealEstate/types';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
@@ -61,9 +60,9 @@ export class PropertyController {
   findAll(
     @Query(new ValidationPipe({ transform: true }))
     query: GetPropertiesQueryParams,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
-    return this.propertyService.findAll(query, resolveTenantId(user));
+    return this.propertyService.findAll(query, scope);
   }
 
   /** GET /properties/:id_property */
@@ -71,9 +70,9 @@ export class PropertyController {
   @ResponseMessage('Property fetched successfully')
   findOne(
     @Param('id_property') id_property: string,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
-    return this.propertyService.findOne(id_property, user);
+    return this.propertyService.findOne(id_property, scope);
   }
 
   /** PATCH /properties/:id_property */
@@ -82,9 +81,9 @@ export class PropertyController {
   update(
     @Param('id_property') id_property: string,
     @Body() updatePropertyDto: UpdatePropertyDto,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
-    return this.propertyService.update(id_property, updatePropertyDto, user);
+    return this.propertyService.update(id_property, updatePropertyDto, scope);
   }
 
   /** DELETE /properties/:id_property */
@@ -93,9 +92,9 @@ export class PropertyController {
   @ResponseMessage('Property deleted successfully')
   remove(
     @Param('id_property') id_property: string,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
-    return this.propertyService.remove(id_property, user);
+    return this.propertyService.remove(id_property, scope);
   }
 
   /** POST /properties/:id_property/reservations */
@@ -104,9 +103,9 @@ export class PropertyController {
   async createReservation(
     @Param('id_property') id_property: string,
     @Body() dto: CreateReservationDto,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
-    await this.propertyService.verifyTenantAccess(id_property, user);
+    await this.propertyService.verifyTenantAccess(id_property, scope);
     return this.reservationService.create(id_property, dto);
   }
 
@@ -116,9 +115,9 @@ export class PropertyController {
   async upsertStats(
     @Param('id_property') id_property: string,
     @Body() dto: CreatePropertyStatsDto,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
-    await this.propertyService.verifyTenantAccess(id_property, user);
+    await this.propertyService.verifyTenantAccess(id_property, scope);
     return this.propertyStatsService.upsert(id_property, dto);
   }
 
@@ -129,9 +128,9 @@ export class PropertyController {
     @Param('id_property') id_property: string,
     @Query(new ValidationPipe({ transform: true }))
     query: GetReservationsQueryParams,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
-    await this.propertyService.verifyTenantAccess(id_property, user);
+    await this.propertyService.verifyTenantAccess(id_property, scope);
     return this.propertyService.findReservations(id_property, query);
   }
 
@@ -141,10 +140,10 @@ export class PropertyController {
   async findCosts(
     @Param('id_property') id_property: string,
     @Query(new ValidationPipe({ transform: true })) query: GetCostsQueryParams,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
-    await this.propertyService.verifyTenantAccess(id_property, user);
-    return this.costService.findAll({ ...query, id_property });
+    await this.propertyService.verifyTenantAccess(id_property, scope);
+    return this.costService.findAll({ ...query, id_property }, scope);
   }
 
   /** POST /properties/:id_property/costs */
@@ -153,9 +152,9 @@ export class PropertyController {
   async createCost(
     @Param('id_property') id_property: string,
     @Body() dto: CreatePropertyCostDto,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
-    await this.propertyService.verifyTenantAccess(id_property, user);
+    await this.propertyService.verifyTenantAccess(id_property, scope);
     return this.costService.create({ ...dto, id_property });
   }
 
@@ -166,9 +165,9 @@ export class PropertyController {
     @Param('id_property') id_property: string,
     @Param('id_cost') id_cost: string,
     @Body() dto: UpdateCostDto,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
-    await this.propertyService.verifyTenantAccess(id_property, user);
+    await this.propertyService.verifyTenantAccess(id_property, scope);
     return this.costService.update(id_cost, dto);
   }
 
@@ -179,9 +178,9 @@ export class PropertyController {
   async deleteCost(
     @Param('id_property') id_property: string,
     @Param('id_cost') id_cost: string,
-    @CurrentUser() user: JwtPayload,
+    @CurrentTenant() scope: TenantScope,
   ) {
-    await this.propertyService.verifyTenantAccess(id_property, user);
+    await this.propertyService.verifyTenantAccess(id_property, scope);
     return this.costService.remove(id_cost);
   }
 }
