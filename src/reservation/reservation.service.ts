@@ -9,7 +9,7 @@ import { ReservationRepository } from './reservation.repository';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { ForwardReservationStatus } from './dto/update-reservation-status.dto';
-import type { TenantScope } from '../common/types/tenant-scope';
+import { type TenantScope, assertTenantMatch } from '../common/types/tenant-scope';
 
 const VALID_TRANSITIONS: Partial<Record<ReservationStatus, ForwardReservationStatus>> = {
   [ReservationStatus.UPCOMING]: ForwardReservationStatus.ACTIVE,
@@ -57,7 +57,7 @@ export class ReservationService {
     if (!reservation)
       throw new NotFoundException(`Reservation with id '${id_reservation}' not found`);
 
-    if (scope) this.verifyTenant(reservation.property.id_tenant, scope, id_reservation);
+    if (scope) assertTenantMatch(scope, reservation.property.id_tenant);
 
     // Strip internal property relation before returning
     const { property: _property, ...result } = reservation;
@@ -69,7 +69,7 @@ export class ReservationService {
     if (!existing)
       throw new NotFoundException(`Reservation with id '${id_reservation}' not found`);
 
-    if (scope) this.verifyTenant(existing.property.id_tenant, scope, id_reservation);
+    if (scope) assertTenantMatch(scope, existing.property.id_tenant);
 
     if (existing.status === ReservationStatus.CANCELLED || existing.status === ReservationStatus.COMPLETED)
       throw new BadRequestException(
@@ -104,7 +104,7 @@ export class ReservationService {
     if (!existing)
       throw new NotFoundException(`Reservation with id '${id_reservation}' not found`);
 
-    if (scope) this.verifyTenant(existing.property.id_tenant, scope, id_reservation);
+    if (scope) assertTenantMatch(scope, existing.property.id_tenant);
 
     const allowedNext = VALID_TRANSITIONS[existing.status];
     if (allowedNext !== newStatus)
@@ -124,7 +124,7 @@ export class ReservationService {
     if (!existing)
       throw new NotFoundException(`Reservation with id '${id_reservation}' not found`);
 
-    if (scope) this.verifyTenant(existing.property.id_tenant, scope, id_reservation);
+    if (scope) assertTenantMatch(scope, existing.property.id_tenant);
 
     if (
       existing.status === ReservationStatus.CANCELLED ||
@@ -135,13 +135,6 @@ export class ReservationService {
       );
 
     return this.reservationRepository.cancel(id_reservation);
-  }
-
-  private verifyTenant(propertyTenantId: string | null, scope: TenantScope, id_reservation: string) {
-    if (scope.type === 'ALL') return;
-    if (propertyTenantId !== scope.tenantId) {
-      throw new NotFoundException(`Reservation with id '${id_reservation}' not found`);
-    }
   }
 
 }

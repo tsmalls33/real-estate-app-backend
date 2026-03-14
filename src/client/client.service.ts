@@ -4,7 +4,7 @@ import { ClientRepository } from './client.repository';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { GetClientsQueryParams } from './dto/get-clients-query-params';
-import type { TenantScope } from '../common/types/tenant-scope';
+import { type TenantScope, assertTenantMatch } from '../common/types/tenant-scope';
 
 @Injectable()
 export class ClientService {
@@ -29,7 +29,7 @@ export class ClientService {
     const client = await this.clientRepository.findById(id_client);
     if (!client) throw new NotFoundException(`Client '${id_client}' not found`);
 
-    if (scope) this.checkTenantMatch(client.id_tenant, scope, id_client);
+    if (scope) assertTenantMatch(scope, client.id_tenant);
 
     return client;
   }
@@ -38,7 +38,7 @@ export class ClientService {
     const client = await this.clientRepository.findById(id_client);
     if (!client) throw new NotFoundException(`Client '${id_client}' not found`);
 
-    if (scope) this.checkTenantMatch(client.id_tenant, scope, id_client);
+    if (scope) assertTenantMatch(scope, client.id_tenant);
 
     return this.clientRepository.update(
       id_client,
@@ -50,19 +50,8 @@ export class ClientService {
     const client = await this.clientRepository.findById(id_client);
     if (!client) throw new NotFoundException(`Client '${id_client}' not found`);
 
-    if (scope) this.checkTenantMatch(client.id_tenant, scope, id_client);
+    if (scope) assertTenantMatch(scope, client.id_tenant);
 
     return this.clientRepository.softDelete(id_client);
-  }
-
-  private checkTenantMatch(
-    clientTenantId: string | null,
-    scope: TenantScope,
-    id_client: string,
-  ) {
-    if (scope.type === 'ALL') return;
-    if (clientTenantId !== scope.tenantId) {
-      throw new NotFoundException(`Client '${id_client}' not found`);
-    }
   }
 }
