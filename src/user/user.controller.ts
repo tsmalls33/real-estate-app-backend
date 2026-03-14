@@ -39,7 +39,7 @@ export class UserController {
   @Get()
   @ResponseMessage('Users fetched successfully')
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRoles.ADMIN, UserRoles.SUPERADMIN)
+  @Roles(UserRoles.ADMIN, UserRoles.SUPERADMIN, UserRoles.EMPLOYEE)
   findAll(@Query() query: GetUsersQueryParams, @CurrentTenant() scope: TenantScope) {
     return this.userService.findAll(query.page, query.limit, scope);
   }
@@ -55,7 +55,7 @@ export class UserController {
   @Get(':id_user')
   @ResponseMessage('User fetched successfully')
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRoles.ADMIN, UserRoles.SUPERADMIN)
+  @Roles(UserRoles.ADMIN, UserRoles.SUPERADMIN, UserRoles.EMPLOYEE)
   findOne(@Param('id_user') id_user: string) {
     return this.userService.findOne(id_user);
   }

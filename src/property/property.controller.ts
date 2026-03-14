@@ -36,7 +36,7 @@ import { ReservationService } from '../reservation/reservation.service';
 import { CreateReservationDto } from '../reservation/dto/create-reservation.dto';
 
 @UseGuards(AuthGuard, RolesGuard)
-@Roles(UserRoles.SUPERADMIN)
+@Roles(UserRoles.SUPERADMIN, UserRoles.ADMIN, UserRoles.EMPLOYEE)
 @ApiTags('Property')
 @Controller('properties')
 export class PropertyController {

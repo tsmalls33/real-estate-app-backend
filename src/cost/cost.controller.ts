@@ -24,7 +24,7 @@ import { GetCostsQueryParams } from './dto/get-costs-query-params';
 
 @ApiTags('Cost')
 @UseGuards(AuthGuard, RolesGuard)
-@Roles(UserRoles.SUPERADMIN)
+@Roles(UserRoles.SUPERADMIN, UserRoles.ADMIN, UserRoles.EMPLOYEE)
 @Controller('costs')
 export class CostController {
   constructor(private readonly costService: CostService) {}
