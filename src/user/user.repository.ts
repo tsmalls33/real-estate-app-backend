@@ -83,13 +83,6 @@ export class UserRepository {
     }) as User;
   }
 
-  async delete(id_user: string): Promise<User> {
-    return await this.prisma.user.delete({
-      where: { id_user },
-      select: USER_PUBLIC_SELECT,
-    }) as User;
-  }
-
   async softDelete(id_user: string): Promise<User> {
     return await this.prisma.user.update({
       where: { id_user },
