@@ -13,7 +13,6 @@ export class PropertyResponseDto {
   id_agent?: string | null;
   id_tenant?: string | null;
   status!: PropertyStatus;
-  isDeleted!: boolean;
   createdAt!: Date;
   updatedAt!: Date;
   // Detail-only fields
