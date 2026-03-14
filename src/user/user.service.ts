@@ -12,6 +12,7 @@ import { ClientService } from '../client/client.service';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { UserResponseDto, PrivateUserResponseDto } from './dto/user-response.dto';
+import type { TenantScope } from '../common/types/tenant-scope';
 
 @Injectable()
 export class UserService {
@@ -62,8 +63,8 @@ export class UserService {
     return user;
   }
 
-  async findAll(page = 1, limit = 20) {
-    return this.userRepository.findWithPagination(page, limit);
+  async findAll(page = 1, limit = 20, scope: TenantScope) {
+    return this.userRepository.findWithPagination(page, limit, scope);
   }
 
   async findOne(id_user: string): Promise<UserResponseDto> {

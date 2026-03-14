@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User, Prisma } from '@prisma/client';
 import { USER_PUBLIC_SELECT, USER_AUTH_SELECT } from './projections/user.projection';
+import type { TenantScope } from '../common/types/tenant-scope';
 
 const AGENT_PAYMENT_SELECT = {
   id_agent_payment: true,
@@ -117,9 +118,13 @@ export class UserRepository {
   async findWithPagination(
     page: number = 1,
     limit: number = 10,
+    scope: TenantScope,
   ): Promise<{ users: User[]; total: number; page: number; limit: number }> {
     const skip = (page - 1) * limit;
-    const where = { isDeleted: false };
+    const where: Prisma.UserWhereInput = {
+      isDeleted: false,
+      ...(scope.type === 'TENANT' && { id_tenant: scope.tenantId }),
+    };
 
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({

@@ -9,6 +9,7 @@ import {
   SaleType,
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import type { TenantScope } from '../common/types/tenant-scope';
 import {
   PROPERTY_DETAIL_SELECT,
   PROPERTY_LIST_SELECT,
@@ -28,19 +29,19 @@ export class PropertyRepository {
   async findAll(filters: {
     status?: PropertyStatus;
     saleType?: SaleType;
-    id_tenant?: string;
+    scope: TenantScope;
     id_agent?: string;
     page: number;
     limit: number;
   }): Promise<{ data: Property[]; total: number }> {
-    const { page, limit, ...filterFields } = filters;
+    const { page, limit, scope, ...filterFields } = filters;
     const skip = (page - 1) * limit;
 
     const where: Prisma.PropertyWhereInput = {
       isDeleted: false,
       ...(filterFields.status && { status: filterFields.status }),
       ...(filterFields.saleType && { saleType: filterFields.saleType }),
-      ...(filterFields.id_tenant && { id_tenant: filterFields.id_tenant }),
+      ...(scope.type === 'TENANT' && { id_tenant: scope.tenantId }),
       ...(filterFields.id_agent && { id_agent: filterFields.id_agent }),
     };
 

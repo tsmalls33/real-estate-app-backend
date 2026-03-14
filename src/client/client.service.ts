@@ -4,6 +4,7 @@ import { ClientRepository } from './client.repository';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { GetClientsQueryParams } from './dto/get-clients-query-params';
+import { type TenantScope, assertTenantMatch } from '../common/types/tenant-scope';
 
 @Injectable()
 export class ClientService {
@@ -15,33 +16,42 @@ export class ClientService {
     );
   }
 
-  async findAll(query: GetClientsQueryParams, tenantId?: string) {
+  async findAll(query: GetClientsQueryParams, scope: TenantScope) {
     return this.clientRepository.findAll({
       search: query.search,
-      id_tenant: tenantId,
+      scope,
       page: query.page ?? 1,
       limit: query.limit ?? 20,
     });
   }
 
-  async findOne(id_client: string) {
+  async findOne(id_client: string, scope?: TenantScope) {
     const client = await this.clientRepository.findById(id_client);
     if (!client) throw new NotFoundException(`Client '${id_client}' not found`);
+
+    if (scope) assertTenantMatch(scope, client.id_tenant);
+
     return client;
   }
 
-  async update(id_client: string, dto: UpdateClientDto) {
-    const exists = await this.clientRepository.existsById(id_client);
-    if (!exists) throw new NotFoundException(`Client '${id_client}' not found`);
+  async update(id_client: string, dto: UpdateClientDto, scope?: TenantScope) {
+    const client = await this.clientRepository.findById(id_client);
+    if (!client) throw new NotFoundException(`Client '${id_client}' not found`);
+
+    if (scope) assertTenantMatch(scope, client.id_tenant);
+
     return this.clientRepository.update(
       id_client,
       dto as Prisma.ClientUncheckedUpdateInput,
     );
   }
 
-  async remove(id_client: string) {
-    const exists = await this.clientRepository.existsById(id_client);
-    if (!exists) throw new NotFoundException(`Client '${id_client}' not found`);
+  async remove(id_client: string, scope?: TenantScope) {
+    const client = await this.clientRepository.findById(id_client);
+    if (!client) throw new NotFoundException(`Client '${id_client}' not found`);
+
+    if (scope) assertTenantMatch(scope, client.id_tenant);
+
     return this.clientRepository.softDelete(id_client);
   }
 }

@@ -15,7 +15,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetUsersQueryParams } from './dto/get-users-query-params';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
+import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
+import type { TenantScope } from '../common/types/tenant-scope';
 import { UserRoles } from '@RealEstate/types';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -37,9 +39,9 @@ export class UserController {
   @Get()
   @ResponseMessage('Users fetched successfully')
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRoles.ADMIN, UserRoles.SUPERADMIN)
-  findAll(@Query() query: GetUsersQueryParams) {
-    return this.userService.findAll(query.page, query.limit);
+  @Roles(UserRoles.ADMIN, UserRoles.SUPERADMIN, UserRoles.EMPLOYEE)
+  findAll(@Query() query: GetUsersQueryParams, @CurrentTenant() scope: TenantScope) {
+    return this.userService.findAll(query.page, query.limit, scope);
   }
 
   /** GET /user/me — must come before GET /user/:id_user */
@@ -53,7 +55,7 @@ export class UserController {
   @Get(':id_user')
   @ResponseMessage('User fetched successfully')
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRoles.ADMIN, UserRoles.SUPERADMIN)
+  @Roles(UserRoles.ADMIN, UserRoles.SUPERADMIN, UserRoles.EMPLOYEE)
   findOne(@Param('id_user') id_user: string) {
     return this.userService.findOne(id_user);
   }
