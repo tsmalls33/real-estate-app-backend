@@ -23,7 +23,7 @@ import { GetAgentPaymentsQueryParams } from './dto/get-agent-payments-query-para
 
 @ApiTags('AgentPayment')
 @UseGuards(AuthGuard, RolesGuard)
-@Roles(UserRoles.SUPERADMIN)
+@Roles(UserRoles.SUPERADMIN, UserRoles.ADMIN, UserRoles.EMPLOYEE)
 @Controller('agent-payments')
 export class AgentPaymentController {
   constructor(private readonly agentPaymentService: AgentPaymentService) {}

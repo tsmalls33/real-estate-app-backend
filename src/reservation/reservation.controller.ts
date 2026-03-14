@@ -30,7 +30,7 @@ import { UpdateReservationStatusDto } from './dto/update-reservation-status.dto'
 
 @ApiTags('Reservation')
 @UseGuards(AuthGuard, RolesGuard)
-@Roles(UserRoles.SUPERADMIN)
+@Roles(UserRoles.SUPERADMIN, UserRoles.ADMIN, UserRoles.EMPLOYEE)
 @Controller('reservations')
 export class ReservationController {
   constructor(

@@ -23,7 +23,7 @@ import { GetClientsQueryParams } from './dto/get-clients-query-params';
 
 @ApiTags('Client')
 @UseGuards(AuthGuard, RolesGuard)
-@Roles(UserRoles.SUPERADMIN)
+@Roles(UserRoles.SUPERADMIN, UserRoles.ADMIN, UserRoles.EMPLOYEE)
 @Controller('clients')
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
