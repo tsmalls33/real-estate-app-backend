@@ -4,6 +4,7 @@ import { AgentPaymentRepository } from './agent-payment.repository';
 import { CreateAgentPaymentDto } from './dto/create-agent-payment.dto';
 import { UpdateAgentPaymentDto } from './dto/update-agent-payment.dto';
 import { GetAgentPaymentsQueryParams } from './dto/get-agent-payments-query-params';
+import { type TenantScope, assertTenantMatch } from '../common/types/tenant-scope';
 
 @Injectable()
 export class AgentPaymentService {
@@ -17,11 +18,11 @@ export class AgentPaymentService {
     );
   }
 
-  async findAll(query: GetAgentPaymentsQueryParams, tenantId?: string) {
+  async findAll(query: GetAgentPaymentsQueryParams, scope: TenantScope) {
     return this.agentPaymentRepository.findAll({
       isPaid: query.isPaid,
       id_user: query.id_user,
-      id_tenant: tenantId,
+      scope,
       startDate: query.startDate,
       endDate: query.endDate,
       page: query.page ?? 1,
@@ -29,36 +30,45 @@ export class AgentPaymentService {
     });
   }
 
-  async findOne(id_agent_payment: string) {
+  async findOne(id_agent_payment: string, scope?: TenantScope) {
     const payment =
       await this.agentPaymentRepository.findById(id_agent_payment);
     if (!payment)
       throw new NotFoundException(
         `AgentPayment '${id_agent_payment}' not found`,
       );
+
+    if (scope) assertTenantMatch(scope, payment.id_tenant);
+
     return payment;
   }
 
-  async update(id_agent_payment: string, dto: UpdateAgentPaymentDto) {
-    const exists =
-      await this.agentPaymentRepository.existsById(id_agent_payment);
-    if (!exists)
+  async update(id_agent_payment: string, dto: UpdateAgentPaymentDto, scope?: TenantScope) {
+    const payment =
+      await this.agentPaymentRepository.findById(id_agent_payment);
+    if (!payment)
       throw new NotFoundException(
         `AgentPayment '${id_agent_payment}' not found`,
       );
+
+    if (scope) assertTenantMatch(scope, payment.id_tenant);
+
     return this.agentPaymentRepository.update(
       id_agent_payment,
       dto as Prisma.AgentPaymentUncheckedUpdateInput,
     );
   }
 
-  async remove(id_agent_payment: string) {
-    const exists =
-      await this.agentPaymentRepository.existsById(id_agent_payment);
-    if (!exists)
+  async remove(id_agent_payment: string, scope?: TenantScope) {
+    const payment =
+      await this.agentPaymentRepository.findById(id_agent_payment);
+    if (!payment)
       throw new NotFoundException(
         `AgentPayment '${id_agent_payment}' not found`,
       );
+
+    if (scope) assertTenantMatch(scope, payment.id_tenant);
+
     return this.agentPaymentRepository.delete(id_agent_payment);
   }
 }

@@ -9,6 +9,7 @@ import { ReservationRepository } from './reservation.repository';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { ForwardReservationStatus } from './dto/update-reservation-status.dto';
+import { type TenantScope, assertTenantMatch } from '../common/types/tenant-scope';
 
 const VALID_TRANSITIONS: Partial<Record<ReservationStatus, ForwardReservationStatus>> = {
   [ReservationStatus.UPCOMING]: ForwardReservationStatus.ACTIVE,
@@ -51,17 +52,24 @@ export class ReservationService {
     });
   }
 
-  async findOne(id_reservation: string) {
-    const reservation = await this.reservationRepository.findById(id_reservation);
+  async findOne(id_reservation: string, scope?: TenantScope) {
+    const reservation = await this.reservationRepository.findByIdWithTenant(id_reservation);
     if (!reservation)
       throw new NotFoundException(`Reservation with id '${id_reservation}' not found`);
-    return reservation;
+
+    if (scope) assertTenantMatch(scope, reservation.property.id_tenant);
+
+    // Strip internal property relation before returning
+    const { property: _property, ...result } = reservation;
+    return result;
   }
 
-  async update(id_reservation: string, dto: UpdateReservationDto) {
-    const existing = await this.reservationRepository.findById(id_reservation);
+  async update(id_reservation: string, dto: UpdateReservationDto, scope?: TenantScope) {
+    const existing = await this.reservationRepository.findByIdWithTenant(id_reservation);
     if (!existing)
       throw new NotFoundException(`Reservation with id '${id_reservation}' not found`);
+
+    if (scope) assertTenantMatch(scope, existing.property.id_tenant);
 
     if (existing.status === ReservationStatus.CANCELLED || existing.status === ReservationStatus.COMPLETED)
       throw new BadRequestException(
@@ -91,10 +99,12 @@ export class ReservationService {
     return this.reservationRepository.update(id_reservation, dto);
   }
 
-  async updateStatus(id_reservation: string, newStatus: ForwardReservationStatus) {
-    const existing = await this.reservationRepository.findById(id_reservation);
+  async updateStatus(id_reservation: string, newStatus: ForwardReservationStatus, scope?: TenantScope) {
+    const existing = await this.reservationRepository.findByIdWithTenant(id_reservation);
     if (!existing)
       throw new NotFoundException(`Reservation with id '${id_reservation}' not found`);
+
+    if (scope) assertTenantMatch(scope, existing.property.id_tenant);
 
     const allowedNext = VALID_TRANSITIONS[existing.status];
     if (allowedNext !== newStatus)
@@ -109,10 +119,12 @@ export class ReservationService {
     );
   }
 
-  async cancel(id_reservation: string) {
-    const existing = await this.reservationRepository.findById(id_reservation);
+  async cancel(id_reservation: string, scope?: TenantScope) {
+    const existing = await this.reservationRepository.findByIdWithTenant(id_reservation);
     if (!existing)
       throw new NotFoundException(`Reservation with id '${id_reservation}' not found`);
+
+    if (scope) assertTenantMatch(scope, existing.property.id_tenant);
 
     if (
       existing.status === ReservationStatus.CANCELLED ||
@@ -124,4 +136,5 @@ export class ReservationService {
 
     return this.reservationRepository.cancel(id_reservation);
   }
+
 }

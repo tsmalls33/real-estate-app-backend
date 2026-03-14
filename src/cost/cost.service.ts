@@ -4,24 +4,17 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { CostType } from '@RealEstate/types';
 import { CostRepository } from './cost.repository';
+import { CreateCostDto } from './dto/create-cost.dto';
 import { GetCostsQueryParams } from './dto/get-costs-query-params';
 import { UpdateCostDto } from './dto/update-cost.dto';
-
-interface CreateCostData {
-  costType: CostType;
-  date: string;
-  amount: number;
-  id_property?: string;
-  id_reservation?: string;
-}
+import { type TenantScope, assertTenantMatch } from '../common/types/tenant-scope';
 
 @Injectable()
 export class CostService {
-  constructor(private readonly costRepository: CostRepository) {}
+  constructor(private readonly costRepository: CostRepository) { }
 
-  async create(data: CreateCostData) {
+  async create(data: CreateCostDto, scope?: TenantScope) {
     let { id_property, id_reservation } = data;
 
     if (id_reservation) {
@@ -43,6 +36,10 @@ export class CostService {
       id_property = reservationProperty;
     }
 
+    if (scope && id_property) {
+      await this.verifyPropertyTenant(id_property, scope);
+    }
+
     return this.costRepository.create({
       costType: data.costType,
       date: new Date(data.date),
@@ -52,14 +49,8 @@ export class CostService {
     } as Prisma.CostUncheckedCreateInput);
   }
 
-  async findAll(query: GetCostsQueryParams) {
-    return this.costRepository.findAll({
-      costType: query.costType,
-      id_property: query.id_property,
-      id_reservation: query.id_reservation,
-      page: query.page ?? 1,
-      limit: query.limit ?? 20,
-    });
+  async findAll(query: GetCostsQueryParams, scope: TenantScope) {
+    return this.costRepository.findAll(query, scope);
   }
 
   async findOne(id_cost: string) {
@@ -68,9 +59,13 @@ export class CostService {
     return cost;
   }
 
-  async update(id_cost: string, dto: UpdateCostDto) {
+  async update(id_cost: string, dto: UpdateCostDto, scope?: TenantScope) {
     const existing = await this.costRepository.existsById(id_cost);
     if (!existing) throw new NotFoundException(`Cost '${id_cost}' not found`);
+
+    if (scope && existing.id_property) {
+      await this.verifyPropertyTenant(existing.id_property, scope);
+    }
 
     const effectiveProperty = dto.id_property ?? existing.id_property;
     const effectiveReservation = dto.id_reservation ?? existing.id_reservation;
@@ -106,9 +101,19 @@ export class CostService {
     return this.costRepository.update(id_cost, updateData);
   }
 
-  async remove(id_cost: string) {
-    const exists = await this.costRepository.existsById(id_cost);
-    if (!exists) throw new NotFoundException(`Cost '${id_cost}' not found`);
+  async remove(id_cost: string, scope?: TenantScope) {
+    const existing = await this.costRepository.existsById(id_cost);
+    if (!existing) throw new NotFoundException(`Cost '${id_cost}' not found`);
+
+    if (scope && existing.id_property) {
+      await this.verifyPropertyTenant(existing.id_property, scope);
+    }
+
     return this.costRepository.delete(id_cost);
+  }
+
+  private async verifyPropertyTenant(id_property: string, scope: TenantScope) {
+    const propertyTenant = await this.costRepository.findPropertyTenant(id_property);
+    assertTenantMatch(scope, propertyTenant);
   }
 }

@@ -19,6 +19,16 @@ export class ReservationRepository {
     });
   }
 
+  async findByIdWithTenant(id_reservation: string) {
+    return this.prisma.reservation.findUnique({
+      where: { id_reservation },
+      select: {
+        ...RESERVATION_SELECT,
+        property: { select: { id_tenant: true } },
+      },
+    });
+  }
+
   async existsById(id_reservation: string): Promise<boolean> {
     const r = await this.prisma.reservation.findUnique({
       where: { id_reservation },
