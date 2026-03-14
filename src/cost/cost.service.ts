@@ -8,7 +8,7 @@ import { CostRepository } from './cost.repository';
 import { CreateCostDto } from './dto/create-cost.dto';
 import { GetCostsQueryParams } from './dto/get-costs-query-params';
 import { UpdateCostDto } from './dto/update-cost.dto';
-import type { TenantScope } from '../common/types/tenant-scope';
+import { type TenantScope, assertTenantMatch } from '../common/types/tenant-scope';
 
 @Injectable()
 export class CostService {
@@ -113,11 +113,7 @@ export class CostService {
   }
 
   private async verifyPropertyTenant(id_property: string, scope: TenantScope) {
-    if (scope.type === 'ALL') return;
-
     const propertyTenant = await this.costRepository.findPropertyTenant(id_property);
-    if (propertyTenant !== scope.tenantId) {
-      throw new NotFoundException(`Cost not found`);
-    }
+    assertTenantMatch(scope, propertyTenant);
   }
 }

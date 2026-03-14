@@ -4,7 +4,7 @@ import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { GetPropertiesQueryParams } from './dto/get-properties-query-params';
 import { GetReservationsQueryParams } from './dto/get-reservations-query-params';
-import type { TenantScope } from '../common/types/tenant-scope';
+import { type TenantScope, assertTenantMatch } from '../common/types/tenant-scope';
 
 import { PropertyRepository } from './property.repository';
 
@@ -36,7 +36,7 @@ export class PropertyService {
         `Property with id '${id_property}' not found`,
       );
 
-    if (scope) this.checkTenantMatch(property.id_tenant, scope, id_property);
+    if (scope) assertTenantMatch(scope, property.id_tenant);
 
     return property;
   }
@@ -48,7 +48,7 @@ export class PropertyService {
         `Property with id '${id_property}' not found`,
       );
 
-    if (scope) this.checkTenantMatch(property.id_tenant, scope, id_property);
+    if (scope) assertTenantMatch(scope, property.id_tenant);
 
     return this.propertyRepository.update(
       id_property,
@@ -63,7 +63,7 @@ export class PropertyService {
         `Property with id '${id_property}' not found`,
       );
 
-    if (scope) this.checkTenantMatch(property.id_tenant, scope, id_property);
+    if (scope) assertTenantMatch(scope, property.id_tenant);
 
     return this.propertyRepository.softDelete(id_property);
   }
@@ -99,23 +99,6 @@ export class PropertyService {
         `Property with id '${id_property}' not found`,
       );
 
-    if (scope.type === 'TENANT' && property.id_tenant !== scope.tenantId) {
-      throw new NotFoundException(
-        `Property with id '${id_property}' not found`,
-      );
-    }
-  }
-
-  private checkTenantMatch(
-    propertyTenantId: string | null,
-    scope: TenantScope,
-    id_property: string,
-  ) {
-    if (scope.type === 'ALL') return;
-    if (propertyTenantId !== scope.tenantId) {
-      throw new NotFoundException(
-        `Property with id '${id_property}' not found`,
-      );
-    }
+    assertTenantMatch(scope, property.id_tenant);
   }
 }

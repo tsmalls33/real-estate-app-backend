@@ -4,7 +4,7 @@ import { AgentPaymentRepository } from './agent-payment.repository';
 import { CreateAgentPaymentDto } from './dto/create-agent-payment.dto';
 import { UpdateAgentPaymentDto } from './dto/update-agent-payment.dto';
 import { GetAgentPaymentsQueryParams } from './dto/get-agent-payments-query-params';
-import type { TenantScope } from '../common/types/tenant-scope';
+import { type TenantScope, assertTenantMatch } from '../common/types/tenant-scope';
 
 @Injectable()
 export class AgentPaymentService {
@@ -38,7 +38,7 @@ export class AgentPaymentService {
         `AgentPayment '${id_agent_payment}' not found`,
       );
 
-    if (scope) this.checkTenantMatch(payment.id_tenant, scope, id_agent_payment);
+    if (scope) assertTenantMatch(scope, payment.id_tenant);
 
     return payment;
   }
@@ -51,7 +51,7 @@ export class AgentPaymentService {
         `AgentPayment '${id_agent_payment}' not found`,
       );
 
-    if (scope) this.checkTenantMatch(payment.id_tenant, scope, id_agent_payment);
+    if (scope) assertTenantMatch(scope, payment.id_tenant);
 
     return this.agentPaymentRepository.update(
       id_agent_payment,
@@ -67,21 +67,8 @@ export class AgentPaymentService {
         `AgentPayment '${id_agent_payment}' not found`,
       );
 
-    if (scope) this.checkTenantMatch(payment.id_tenant, scope, id_agent_payment);
+    if (scope) assertTenantMatch(scope, payment.id_tenant);
 
     return this.agentPaymentRepository.delete(id_agent_payment);
-  }
-
-  private checkTenantMatch(
-    paymentTenantId: string | null,
-    scope: TenantScope,
-    id_agent_payment: string,
-  ) {
-    if (scope.type === 'ALL') return;
-    if (paymentTenantId !== scope.tenantId) {
-      throw new NotFoundException(
-        `AgentPayment '${id_agent_payment}' not found`,
-      );
-    }
   }
 }
