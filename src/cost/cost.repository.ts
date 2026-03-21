@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import type { TenantScope } from '../common/types/tenant-scope';
+import { tenantFilter, type TenantScope } from '../common/types/tenant-scope';
 import { GetCostsQueryParams } from './dto/get-costs-query-params';
 import { COST_SELECT } from './projections/cost.projection';
 
@@ -23,7 +23,7 @@ export class CostRepository {
       ...(costType && { costType: costType }),
       ...(id_property && { id_property }),
       ...(id_reservation && { id_reservation }),
-      ...(scope.type === 'TENANT' && { property: { id_tenant: scope.tenantId } }),
+      ...tenantFilter(scope, 'property'),
     };
 
     const [data, total] = await this.prisma.$transaction([

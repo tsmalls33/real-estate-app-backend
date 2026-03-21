@@ -9,7 +9,7 @@ import {
   SaleType,
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import type { TenantScope } from '../common/types/tenant-scope';
+import { tenantFilter, type TenantScope } from '../common/types/tenant-scope';
 import {
   PROPERTY_DETAIL_SELECT,
   PROPERTY_LIST_SELECT,
@@ -41,7 +41,7 @@ export class PropertyRepository {
       isDeleted: false,
       ...(filterFields.status && { status: filterFields.status }),
       ...(filterFields.saleType && { saleType: filterFields.saleType }),
-      ...(scope.type === 'TENANT' && { id_tenant: scope.tenantId }),
+      ...tenantFilter(scope),
       ...(filterFields.id_agent && { id_agent: filterFields.id_agent }),
     };
 
