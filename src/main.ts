@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { SwaggerTheme, SwaggerThemeNameEnum } from 'swagger-themes';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
@@ -32,7 +33,9 @@ async function bootstrap() {
     .addSecurityRequirements('bearer')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
+  const theme = new SwaggerTheme();
   SwaggerModule.setup('api', app, documentFactory, {
+    customCss: theme.getBuffer(SwaggerThemeNameEnum.DARK),
     swaggerOptions: {
       persistAuthorization: true,
     },
