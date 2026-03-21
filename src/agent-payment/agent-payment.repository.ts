@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import type { TenantScope } from '../common/types/tenant-scope';
+import { tenantFilter, type TenantScope } from '../common/types/tenant-scope';
 import { AGENT_PAYMENT_SELECT } from './projections/agent-payment.projection';
 
 @Injectable()
@@ -31,7 +31,7 @@ export class AgentPaymentRepository {
       isDeleted: false,
       ...(isPaid !== undefined && { isPaid }),
       ...(id_user && { id_user }),
-      ...(scope.type === 'TENANT' && { id_tenant: scope.tenantId }),
+      ...tenantFilter(scope),
       ...((startDate || endDate) && {
         dueDate: {
           ...(startDate && { gte: new Date(startDate) }),

@@ -17,3 +17,25 @@ export function assertTenantMatch(
     throw new NotFoundException('Record not found in your organization');
   }
 }
+
+/**
+ * Returns a Prisma-compatible where-clause fragment that scopes a query to a
+ * single tenant. Superadmin (scope.type === 'ALL') returns an empty object so
+ * the spread is a no-op.
+ *
+ * @param scope  The current user's tenant scope.
+ * @param path   Optional relation path for models that reach the tenant
+ *               through a relation (e.g. Cost -> Property).
+ *
+ * @example Direct:  where: { ...tenantFilter(scope) }
+ * @example Nested:  where: { ...tenantFilter(scope, 'property') }
+ */
+export function tenantFilter(
+  scope: TenantScope,
+  path?: string,
+): Record<string, unknown> {
+  if (scope.type === 'ALL') return {};
+
+  const leaf = { id_tenant: scope.tenantId };
+  return path ? { [path]: leaf } : leaf;
+}
