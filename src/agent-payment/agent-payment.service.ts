@@ -12,10 +12,12 @@ export class AgentPaymentService {
     private readonly agentPaymentRepository: AgentPaymentRepository,
   ) {}
 
-  async create(dto: CreateAgentPaymentDto) {
-    return this.agentPaymentRepository.create(
-      dto as Prisma.AgentPaymentUncheckedCreateInput,
-    );
+  async create(dto: CreateAgentPaymentDto, scope: TenantScope) {
+    const id_tenant = scope.type === 'TENANT' ? scope.tenantId : null;
+    return this.agentPaymentRepository.create({
+      ...(dto as Prisma.AgentPaymentUncheckedCreateInput),
+      id_tenant,
+    });
   }
 
   async findAll(query: GetAgentPaymentsQueryParams, scope: TenantScope) {

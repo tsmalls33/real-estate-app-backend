@@ -19,6 +19,19 @@ export function assertTenantMatch(
 }
 
 /**
+ * Resolve the effective tenant ID for create operations.
+ * TENANT scope: always returns scope.tenantId (ignores dto value).
+ * ALL scope: returns dtoTenantId if provided, else null.
+ */
+export function resolveTenantId(
+  scope: TenantScope,
+  dtoTenantId?: string | null,
+): string | null {
+  if (scope.type === 'TENANT') return scope.tenantId;
+  return dtoTenantId ?? null;
+}
+
+/**
  * Returns a Prisma-compatible where-clause fragment that scopes a query to a
  * single tenant. Superadmin (scope.type === 'ALL') returns an empty object so
  * the spread is a no-op.

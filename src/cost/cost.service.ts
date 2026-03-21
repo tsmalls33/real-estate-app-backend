@@ -53,9 +53,12 @@ export class CostService {
     return this.costRepository.findAll(query, scope);
   }
 
-  async findOne(id_cost: string) {
+  async findOne(id_cost: string, scope?: TenantScope) {
     const cost = await this.costRepository.findById(id_cost);
     if (!cost) throw new NotFoundException(`Cost '${id_cost}' not found`);
+    if (scope && cost.id_property) {
+      await this.verifyPropertyTenant(cost.id_property, scope);
+    }
     return cost;
   }
 

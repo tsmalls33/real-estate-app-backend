@@ -92,7 +92,7 @@ export class AuthService {
       lastName,
       role,
       id_tenant,
-    });
+    }, { type: 'ALL' });
 
     return newUser;
   }
