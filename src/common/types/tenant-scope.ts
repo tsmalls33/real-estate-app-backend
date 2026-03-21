@@ -17,3 +17,16 @@ export function assertTenantMatch(
     throw new NotFoundException('Record not found in your organization');
   }
 }
+
+/**
+ * Resolve the effective tenant ID for create operations.
+ * TENANT scope: always returns scope.tenantId (ignores dto value).
+ * ALL scope: returns dtoTenantId if provided, else null.
+ */
+export function resolveTenantId(
+  scope: TenantScope,
+  dtoTenantId?: string | null,
+): string | null {
+  if (scope.type === 'TENANT') return scope.tenantId;
+  return dtoTenantId ?? null;
+}

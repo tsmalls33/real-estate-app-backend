@@ -1,10 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { GetPropertiesQueryParams } from './dto/get-properties-query-params';
 import { GetReservationsQueryParams } from './dto/get-reservations-query-params';
-import { type TenantScope, assertTenantMatch } from '../common/types/tenant-scope';
+import { type TenantScope, assertTenantMatch, resolveTenantId } from '../common/types/tenant-scope';
 
 import { PropertyRepository } from './property.repository';
 
@@ -12,10 +12,13 @@ import { PropertyRepository } from './property.repository';
 export class PropertyService {
   constructor(private readonly propertyRepository: PropertyRepository) {}
 
-  async create(dto: CreatePropertyDto) {
-    return this.propertyRepository.create(
-      dto as Prisma.PropertyUncheckedCreateInput,
-    );
+  async create(dto: CreatePropertyDto, scope: TenantScope) {
+    const id_tenant = resolveTenantId(scope, dto.id_tenant);
+    if (!id_tenant) throw new BadRequestException('id_tenant is required');
+    return this.propertyRepository.create({
+      ...(dto as Prisma.PropertyUncheckedCreateInput),
+      id_tenant,
+    });
   }
 
   async findAll(query: GetPropertiesQueryParams, scope: TenantScope) {
