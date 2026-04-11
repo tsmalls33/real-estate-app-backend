@@ -39,8 +39,8 @@ export class AgentPaymentController {
   }
 
   @Post()
-  create(@Body() dto: CreateAgentPaymentDto) {
-    return this.agentPaymentService.create(dto);
+  create(@Body() dto: CreateAgentPaymentDto, @CurrentTenant() scope: TenantScope) {
+    return this.agentPaymentService.create(dto, scope);
   }
 
   @Patch(':id')

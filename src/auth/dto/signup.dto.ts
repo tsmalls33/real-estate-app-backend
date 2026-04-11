@@ -1,8 +1,13 @@
-import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { SignInDto } from './signin.dto';
-import { CreateUserDto, UserRoles } from '@RealEstate/types';
 
-export class SignUpDto extends SignInDto implements Omit<CreateUserDto, 'email' | 'password'> {
+/**
+ * Public sign-up DTO. Deliberately does NOT accept `role` or `id_tenant` —
+ * public sign-ups are always created as the default role (CLIENT) with no
+ * tenant. Admins/employees must be provisioned via the protected
+ * `POST /users` endpoint.
+ */
+export class SignUpDto extends SignInDto {
   @IsString()
   @IsOptional()
   firstName?: string;
@@ -10,14 +15,4 @@ export class SignUpDto extends SignInDto implements Omit<CreateUserDto, 'email' 
   @IsString()
   @IsOptional()
   lastName?: string;
-
-  @IsString()
-  @IsOptional()
-  @IsEnum(UserRoles)
-  role?: UserRoles;
-
-  @IsString()
-  @IsOptional()
-  @IsUUID()
-  id_tenant?: string;
 }

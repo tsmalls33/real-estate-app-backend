@@ -83,16 +83,19 @@ export class AuthService {
   }
 
   async signUp(input: SignUpDto): Promise<UserResponseDto> {
-    const { email, password, firstName, lastName, role, id_tenant } = input;
+    const { email, password, firstName, lastName } = input;
 
-    const newUser = await this.userService.createUser({
-      email,
-      password,
-      firstName,
-      lastName,
-      role,
-      id_tenant,
-    });
+    // Public sign-up: never trust the body for `role` or `id_tenant`.
+    // Users are always created with the default role (CLIENT) and no tenant.
+    const newUser = await this.userService.createUser(
+      {
+        email,
+        password,
+        firstName,
+        lastName,
+      },
+      { type: 'ALL' },
+    );
 
     return newUser;
   }

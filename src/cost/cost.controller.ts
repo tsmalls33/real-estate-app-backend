@@ -38,8 +38,8 @@ export class CostController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.costService.findOne(id);
+  findOne(@Param('id') id: string, @CurrentTenant() scope: TenantScope) {
+    return this.costService.findOne(id, scope);
   }
 
   @Post()

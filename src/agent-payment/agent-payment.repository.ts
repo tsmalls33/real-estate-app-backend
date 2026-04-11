@@ -87,4 +87,13 @@ export class AgentPaymentRepository {
       select: AGENT_PAYMENT_SELECT,
     });
   }
+
+  async findUserTenant(id_user: string): Promise<string | null | undefined> {
+    const user = await this.prisma.user.findFirst({
+      where: { id_user, isDeleted: false },
+      select: { id_tenant: true },
+    });
+    // `undefined` means the user does not exist; `null` means the user has no tenant.
+    return user === null ? undefined : user.id_tenant;
+  }
 }

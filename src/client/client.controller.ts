@@ -39,8 +39,8 @@ export class ClientController {
   }
 
   @Post()
-  create(@Body() dto: CreateClientDto) {
-    return this.clientService.create(dto);
+  create(@Body() dto: CreateClientDto, @CurrentTenant() scope: TenantScope) {
+    return this.clientService.create(dto, scope);
   }
 
   @Patch(':id')

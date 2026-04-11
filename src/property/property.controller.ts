@@ -50,8 +50,8 @@ export class PropertyController {
   /** POST /properties */
   @Post()
   @ResponseMessage('Property created successfully')
-  create(@Body() createPropertyDto: CreatePropertyDto) {
-    return this.propertyService.create(createPropertyDto);
+  create(@Body() createPropertyDto: CreatePropertyDto, @CurrentTenant() scope: TenantScope) {
+    return this.propertyService.create(createPropertyDto, scope);
   }
 
   /** GET /properties?status=&saleType=&id_tenant=&id_agent=&page=&limit= */
