@@ -111,11 +111,14 @@ export class UserService {
     if (!user) throw new NotFoundException('User not found');
     if (scope) assertTenantMatch(scope, user.id_tenant);
 
-    if (scope?.type === 'TENANT') {
-      delete input.id_tenant;
-    }
+    // Tenant-scoped callers cannot reassign a user to a different tenant.
+    // Strip `id_tenant` via destructuring instead of mutating `input`.
+    const updateInput =
+      scope?.type === 'TENANT'
+        ? (({ id_tenant: _ignored, ...rest }) => rest)(input)
+        : input;
 
-    return await this.userRepository.update(id_user, input);
+    return await this.userRepository.update(id_user, updateInput);
   }
 
   async remove(id_user: string, scope?: TenantScope): Promise<UserResponseDto> {

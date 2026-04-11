@@ -56,8 +56,8 @@ export class CostService {
   async findOne(id_cost: string, scope?: TenantScope) {
     const cost = await this.costRepository.findById(id_cost);
     if (!cost) throw new NotFoundException(`Cost '${id_cost}' not found`);
-    if (scope && cost.id_property) {
-      await this.verifyPropertyTenant(cost.id_property, scope);
+    if (scope) {
+      await this.assertCostTenant(cost, scope);
     }
     return cost;
   }
@@ -66,8 +66,9 @@ export class CostService {
     const existing = await this.costRepository.findById(id_cost);
     if (!existing) throw new NotFoundException(`Cost '${id_cost}' not found`);
 
-    if (scope && existing.id_property) {
-      await this.verifyPropertyTenant(existing.id_property, scope);
+    // Authorize against the cost's CURRENT tenant before any changes.
+    if (scope) {
+      await this.assertCostTenant(existing, scope);
     }
 
     const effectiveProperty = dto.id_property ?? existing.id_property;
@@ -96,6 +97,17 @@ export class CostService {
       }
     }
 
+    // If the update moves the cost to a different property, the NEW property
+    // must also be in-scope. Prevents a tenant-scoped caller from relocating
+    // their own cost onto another tenant's property.
+    if (
+      scope &&
+      dto.id_property &&
+      dto.id_property !== existing.id_property
+    ) {
+      await this.verifyPropertyTenant(dto.id_property, scope);
+    }
+
     const updateData: Prisma.CostUncheckedUpdateInput = {
       ...dto,
       ...(dto.date && { date: new Date(dto.date) }),
@@ -108,11 +120,39 @@ export class CostService {
     const existing = await this.costRepository.findById(id_cost);
     if (!existing) throw new NotFoundException(`Cost '${id_cost}' not found`);
 
-    if (scope && existing.id_property) {
-      await this.verifyPropertyTenant(existing.id_property, scope);
+    if (scope) {
+      await this.assertCostTenant(existing, scope);
     }
 
     return this.costRepository.softDelete(id_cost);
+  }
+
+  /**
+   * Resolve the property a cost belongs to (directly or via its reservation),
+   * then assert the scope has access to that property's tenant.
+   *
+   * A cost with neither id_property nor id_reservation is untenanted and is
+   * only reachable by SUPERADMIN.
+   */
+  private async assertCostTenant(
+    cost: { id_property: string | null; id_reservation: string | null },
+    scope: TenantScope,
+  ): Promise<void> {
+    if (scope.type === 'ALL') return;
+
+    let id_property = cost.id_property;
+    if (!id_property && cost.id_reservation) {
+      id_property = await this.costRepository.findReservationProperty(
+        cost.id_reservation,
+      );
+    }
+
+    if (!id_property) {
+      // Nothing to scope against — treat as not found for this tenant.
+      throw new NotFoundException('Record not found in your organization');
+    }
+
+    await this.verifyPropertyTenant(id_property, scope);
   }
 
   private async verifyPropertyTenant(id_property: string, scope: TenantScope) {

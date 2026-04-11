@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AgentPaymentService } from './agent-payment.service';
 import { AgentPaymentRepository } from './agent-payment.repository';
@@ -32,6 +32,7 @@ describe('AgentPaymentService – tenant scoping', () => {
       existsById: jest.fn(),
       update: jest.fn(),
       softDelete: jest.fn(),
+      findUserTenant: jest.fn(),
     } as unknown as jest.Mocked<AgentPaymentRepository>;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -133,7 +134,8 @@ describe('AgentPaymentService – tenant scoping', () => {
   describe('create', () => {
     const dto = { dueDate: '2026-04-01', amount: 300, isPaid: false, id_user: 'user-1' };
 
-    it('should auto-set id_tenant from TENANT scope', async () => {
+    it('should inherit id_tenant from the target user when tenant matches', async () => {
+      mockRepo.findUserTenant.mockResolvedValue(TENANT_A);
       mockRepo.create.mockImplementation(async (data) => ({ ...data, id_agent_payment: 'new-1' } as any));
 
       await service.create(dto as any, mockTenantScope(TENANT_A));
@@ -143,13 +145,38 @@ describe('AgentPaymentService – tenant scoping', () => {
       );
     });
 
-    it('should set id_tenant to null for SUPERADMIN', async () => {
+    it('should throw NotFoundException when the target user does not exist', async () => {
+      mockRepo.findUserTenant.mockResolvedValue(undefined);
+
+      await expect(
+        service.create(dto as any, mockTenantScope(TENANT_A)),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw NotFoundException when target user is in another tenant', async () => {
+      mockRepo.findUserTenant.mockResolvedValue(TENANT_B);
+
+      await expect(
+        service.create(dto as any, mockTenantScope(TENANT_A)),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw BadRequestException for a user with no tenant', async () => {
+      mockRepo.findUserTenant.mockResolvedValue(null);
+
+      await expect(
+        service.create(dto as any, mockSuperadminScope()),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should allow SUPERADMIN to create, inheriting the user tenant', async () => {
+      mockRepo.findUserTenant.mockResolvedValue(TENANT_B);
       mockRepo.create.mockImplementation(async (data) => ({ ...data, id_agent_payment: 'new-2' } as any));
 
       await service.create(dto as any, mockSuperadminScope());
 
       expect(mockRepo.create).toHaveBeenCalledWith(
-        expect.objectContaining({ id_tenant: null }),
+        expect.objectContaining({ id_tenant: TENANT_B }),
       );
     });
   });
